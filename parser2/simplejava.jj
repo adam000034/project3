@@ -1,0 +1,339 @@
+options {
+  IGNORE_CASE=true;
+}
+
+PARSER_BEGIN(simplejava)
+
+public class simplejava {
+}
+
+PARSER_END(simplejava)
+
+TOKEN_MGR_DECLS : 
+{
+	public static int nestedcomments = 0;
+}
+
+SKIP : 
+{
+  	< " " >
+|   < "\\t">
+|   < "\t">
+|	< "EOF">
+|	< "\n">
+|	< "/*" > { nestedcomments++; SwitchTo(IN_COMMENT);}
+|	< "//" (~["\n"])* "\n" >
+}
+
+<IN_COMMENT>
+SKIP :
+{
+	< "*/" > { nestedcomments--; if (nestedcomments == 0) SwitchTo(DEFAULT);}
+|	< "/*" > { nestedcomments++; }
+|	< ~[] >
+}
+
+TOKEN : 
+{
+	< ELSE: "else">
+|	< FOR: "for">
+|	< IF: "if">
+|	< WHILE: "while">
+|	< DO: "do">
+|	< CLASS: "class">
+|	< TRUE: "true">
+|	< FALSE: "false">
+|	< RETURN: "return">
+|	< NEW: "new">
+}
+
+TOKEN : 
+{
+	< PLUS: "+" >
+|	< SEMICOLON: ";">
+|	< MINUS: "-">
+|	< TIMES: "*">
+|	< DIVIDE: "/">
+|	< EQUAL: "==">
+|	< GREATER_THAN: ">">
+|	< NOT: "!">
+|	< LEFT_BRACE: "{">
+|	< LEFT_BRACKET: "[">
+|	< RIGHT_BRACKET: "]">
+|	< PERIOD: ".">
+|	< COMMA: ",">
+|	< GREATER_THAN_OR_EQUAL_TO: ">=">
+|	< AND: "&&">
+|	< RIGHT_BRACE: "}">
+|	< LEFT_PARENTHESIS: "(">
+|	< RIGHT_PARENTHESIS: ")">
+|	< NOT_EQUAL: "!=">
+|	< LESS_THAN_OR_EQUAL_TO: "<=">
+|	< LESS_THAN: "<">
+|	< GETS: "=">
+|	< OR: "||">
+|	< ADD: "++">
+|	< MINUSMINUS: "--">
+|   < INTEGER_LITERAL: (["0"-"9"])+>
+|	< IDENTIFIER: ["a"-"z"](["a"-"z","0"-"9"])*>
+}
+
+void incrementstatement() :
+{}
+{
+	<ADD>
+}
+
+void decrementstatement() :
+{}
+{
+	<MINUSMINUS>
+}
+
+void program() :
+{}
+{    
+/*perhaps put a star there to check multiple statements */
+	/* 1) 0 or more class defs	2) 0 or more function defs	3) EOF */
+	((classdefinitions())*) ((functionprototypeordefinition())*) <EOF> 
+//	expression() <EOF>
+}
+
+void functionprototypeordefinition() :
+{}
+{
+	<IDENTIFIER> <IDENTIFIER> <LEFT_PARENTHESIS> ((formalparameterlist())?) <RIGHT_PARENTHESIS> (<SEMICOLON> | <LEFT_BRACE> ((statement())*) <RIGHT_BRACE>) 
+}
+
+void functionendingafterparen() :
+{}
+{
+	/* FUNCTION PROTOTYPE */
+	<SEMICOLON>
+	/* FUNCTION DEFINITION */
+|	<LEFT_BRACE> ((statement())*) <RIGHT_BRACE>
+}
+
+void formalparameterlist() :
+{}
+{
+	(formalparameter())((<COMMA>formalparameter())*)
+}
+
+void formalparameter() :
+{}
+{
+	<IDENTIFIER> <IDENTIFIER> variabledeclarations()
+}
+
+void variabledeclarations() :
+{}
+{	
+	((<LEFT_BRACKET> <RIGHT_BRACKET>)*)
+}
+
+void variabledefinitions() :
+{}
+{
+	((<IDENTIFIER> <IDENTIFIER> (variabledeclarations())<SEMICOLON>)*)
+}
+
+void expressionlist() :
+{}
+{
+	expression()((<COMMA>expression())*)
+}
+
+void statementlist() :
+{}
+{
+	statement()((statement())*)
+}
+
+void variable() :
+{}
+{
+	((followsvariables())?)
+	
+	/*<LEFT_BRACKET> followsbrackets()*/
+}
+
+void followsclassdefinitionstypes() :
+{}
+{
+	<LEFT_BRACKET> ((followsbrackets())+) 
+
+}
+
+void classdefinitions() :
+{}
+{
+	/* Get value of identifier so that identifier will not show up in the body */
+	<CLASS> <IDENTIFIER> <LEFT_BRACE> variabledefinitions() <RIGHT_BRACE>
+}
+
+void statement() :
+{}
+{
+	dowhilestatement()
+|	<RETURN> expression() <SEMICOLON>
+|	<WHILE> <LEFT_PARENTHESIS> test() <RIGHT_PARENTHESIS> statement()
+|	<IF> ifstatement()
+|	forstatement()
+|	<LEFT_BRACE> ((statement())*) <RIGHT_BRACE>
+|	<IDENTIFIER> ((<IDENTIFIER> variabledeclarations())| variable()) ((followsvariablenames())?) <SEMICOLON>
+|	emptystatement()
+}
+
+void test() :
+{}
+{
+/*	booleanexpression()
+|	<IDENTIFIER> ((expressionsversionfollowsvariablenames())?) */
+expression()
+}
+
+void ifstatement() :
+{}
+{
+	<LEFT_PARENTHESIS> expression() (((<AND> expression())?) | ((<OR> expression())?)) <RIGHT_PARENTHESIS> statement() ((LOOKAHEAD(1) <ELSE> statement())?) 
+}
+
+void emptystatement() :
+{}
+{
+	<SEMICOLON>
+}
+
+void dowhilestatement() :
+{}
+{
+	<DO> statement() <WHILE> <LEFT_PARENTHESIS> expression() (((<AND> expression())?) | ((<OR> expression())?)) <RIGHT_PARENTHESIS> 
+}
+
+void initialization() :
+{}
+{
+	incrementstatement()
+|	decrementstatement()
+|	assignmentstatement()
+}
+
+void forstatement() :
+{}
+{
+	/*Second initialization() is actually increment from book */
+	<FOR> <LEFT_PARENTHESIS> 
+		((<IDENTIFIER> (followsvariablenames())*)?) <SEMICOLON> 
+		test() <SEMICOLON> 
+		((<IDENTIFIER> initialization())?) 
+		<RIGHT_PARENTHESIS> statement()
+}
+
+void expression() :
+{}
+{
+	expone()((<OR>expone())*)
+}
+
+void expone() :
+{}
+{
+	exptwo()((<AND>exptwo())*)
+}
+
+void exptwo() :
+{}
+{
+	expthree()((<NOT>expthree())*)
+}
+
+void expthree() :
+{}
+{
+	expfour()(((<EQUAL> | <NOT_EQUAL> | <LESS_THAN> | <LESS_THAN_OR_EQUAL_TO> | <GREATER_THAN> | <GREATER_THAN_OR_EQUAL_TO>) expfour())*)	
+}
+
+void expfour() :
+{}
+{
+	expfive()(((<PLUS> | <MINUS>)expfive())*)
+}
+
+void expfive() :
+{}
+{
+	F()(((<TIMES> | <DIVIDE>)F())*)
+}
+
+void F() :
+{}
+{
+	<MINUS> <INTEGER_LITERAL>
+|	<INTEGER_LITERAL>
+|	<TRUE>
+|	<FALSE>
+|	<IDENTIFIER> ((followsvariablenamesforexpressions())?)
+|	<NEW> <IDENTIFIER> followsnewandidentifier()
+|	<LEFT_PARENTHESIS>expression()<RIGHT_PARENTHESIS>
+}
+
+void assignmentstatement() :
+{}
+{
+	<GETS> expression()
+	/*((<IDENTIFIER> ((followsvariablenames())?)) | (<INTEGER_LITERAL>) | (<NEW> <IDENTIFIER> (followsnewandidentifier())) | (<TRUE>) | (<FALSE>)) */
+
+}
+
+void followsnewandidentifier() :
+{}
+{
+	<LEFT_BRACKET> (followsbrackets())
+|	<LEFT_PARENTHESIS><RIGHT_PARENTHESIS>
+}
+
+void incrementstatements() :
+{}
+{
+	incrementstatement()
+|	decrementstatement()
+}
+
+void followsvariables() :
+{}
+{
+	((<PERIOD> <IDENTIFIER>)+) ((followsvariables())?)
+|	((<LEFT_BRACKET> expression() <RIGHT_BRACKET>)+) ((followsvariables())?)
+}
+
+void followsvariablenames() :
+{}
+{
+	/* How to prevent from class types from getting the same rules as variables*/
+	/*<IDENTIFIER> ((followsvariablenames())*)*/ 
+	<LEFT_PARENTHESIS> ((expressionlist())?) <RIGHT_PARENTHESIS> ((followsvariablenames())?)
+|	assignmentstatement() 
+/* Need a way to make sure that amount of brackets are matched on left side with number on right side */
+/*|	variabledeclarationstatemementsbrackets() ((followsvariablenames())?)*/
+|	incrementstatements()
+}
+
+void followsvariablenamesforexpressions() :
+{}
+{
+	/* How to prevent from class types from getting the same rules as variables*/
+	<IDENTIFIER> ((followsvariablenamesforexpressions())*) 
+|	((<PERIOD> <IDENTIFIER>)+) ((followsvariablenamesforexpressions())?)
+|	<LEFT_PARENTHESIS> ((expressionlist())?) <RIGHT_PARENTHESIS> ((followsvariablenamesforexpressions())?)
+/* Need a way to make sure that amount of brackets are matched on left side with number on right side */
+/*|	variabledeclarationstatemementsbrackets() ((followsvariablenamesforexpressions())?)*/
+|	((<LEFT_BRACKET> expression() <RIGHT_BRACKET>)+) ((followsvariablenamesforexpressions())?) 
+|	incrementstatements()
+}
+
+void followsbrackets() :
+{}
+{
+	expression() <RIGHT_BRACKET>((<LEFT_BRACKET><RIGHT_BRACKET>)*)
+}
