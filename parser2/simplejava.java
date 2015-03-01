@@ -40,12 +40,6 @@ public class simplejava implements simplejavaConstants {
     jj_consume_token(0);
   }
 
-  static final public ASTExpression complete_expression() throws ParseException {ASTExpression result;
-    result = expression();
-{if ("" != null) return result;}
-    throw new Error("Missing return statement in function");
-  }
-
   static final public void functionprototypeordefinition() throws ParseException {
     jj_consume_token(IDENTIFIER);
     jj_consume_token(IDENTIFIER);

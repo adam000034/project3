@@ -102,14 +102,6 @@ void program() :
 
 
 
-ASTExpression complete_expression():
-{ASTExpression result;}
-{
-	result = expression() {return result;}
-}
-
-
-
 void functionprototypeordefinition() :
 {}
 {
