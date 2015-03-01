@@ -40,6 +40,12 @@ public class simplejava implements simplejavaConstants {
     jj_consume_token(0);
   }
 
+  static final public ASTExpression complete_expression() throws ParseException {ASTExpression result;
+    result = expression();
+{if ("" != null) return result;}
+    throw new Error("Missing return statement in function");
+  }
+
   static final public void functionprototypeordefinition() throws ParseException {
     jj_consume_token(IDENTIFIER);
     jj_consume_token(IDENTIFIER);
@@ -487,8 +493,8 @@ public class simplejava implements simplejavaConstants {
     statement();
   }
 
-  static final public void expression() throws ParseException {
-    expone();
+  static final public ASTExpression expression() throws ParseException {Token t;ASTExpression result; ASTExpression rhs;
+    result = expone();
     label_13:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -500,13 +506,16 @@ public class simplejava implements simplejavaConstants {
         jj_la1[27] = jj_gen;
         break label_13;
       }
-      jj_consume_token(OR);
-      expone();
+      t = jj_consume_token(OR);
+      rhs = expone();
+result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
     }
+{if ("" != null) return result;}
+    throw new Error("Missing return statement in function");
   }
 
-  static final public void expone() throws ParseException {
-    exptwo();
+  static final public ASTExpression expone() throws ParseException {Token t; ASTExpression result; ASTExpression rhs;
+    result = exptwo();
     label_14:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -518,13 +527,16 @@ public class simplejava implements simplejavaConstants {
         jj_la1[28] = jj_gen;
         break label_14;
       }
-      jj_consume_token(AND);
-      exptwo();
+      t = jj_consume_token(AND);
+      rhs = exptwo();
+result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
     }
+{if ("" != null) return result;}
+    throw new Error("Missing return statement in function");
   }
 
-  static final public void exptwo() throws ParseException {
-    expthree();
+  static final public ASTExpression exptwo() throws ParseException {Token t; ASTExpression result; ASTExpression rhs;
+    result = expthree();
     label_15:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -536,13 +548,16 @@ public class simplejava implements simplejavaConstants {
         jj_la1[29] = jj_gen;
         break label_15;
       }
-      jj_consume_token(NOT);
-      expthree();
+      t = jj_consume_token(NOT);
+      rhs = expthree();
+result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
     }
+{if ("" != null) return result;}
+    throw new Error("Missing return statement in function");
   }
 
-  static final public void expthree() throws ParseException {
-    expfour();
+  static final public ASTExpression expthree() throws ParseException {Token t; ASTExpression result; ASTExpression rhs;
+    result = expfour();
     label_16:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -561,27 +576,27 @@ public class simplejava implements simplejavaConstants {
       }
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case EQUAL:{
-        jj_consume_token(EQUAL);
+        t = jj_consume_token(EQUAL);
         break;
         }
       case NOT_EQUAL:{
-        jj_consume_token(NOT_EQUAL);
+        t = jj_consume_token(NOT_EQUAL);
         break;
         }
       case LESS_THAN:{
-        jj_consume_token(LESS_THAN);
+        t = jj_consume_token(LESS_THAN);
         break;
         }
       case LESS_THAN_OR_EQUAL_TO:{
-        jj_consume_token(LESS_THAN_OR_EQUAL_TO);
+        t = jj_consume_token(LESS_THAN_OR_EQUAL_TO);
         break;
         }
       case GREATER_THAN:{
-        jj_consume_token(GREATER_THAN);
+        t = jj_consume_token(GREATER_THAN);
         break;
         }
       case GREATER_THAN_OR_EQUAL_TO:{
-        jj_consume_token(GREATER_THAN_OR_EQUAL_TO);
+        t = jj_consume_token(GREATER_THAN_OR_EQUAL_TO);
         break;
         }
       default:
@@ -589,12 +604,15 @@ public class simplejava implements simplejavaConstants {
         jj_consume_token(-1);
         throw new ParseException();
       }
-      expfour();
+      rhs = expfour();
+result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
     }
+{if ("" != null) return result;}
+    throw new Error("Missing return statement in function");
   }
 
-  static final public void expfour() throws ParseException {
-    expfive();
+  static final public ASTExpression expfour() throws ParseException {Token t; ASTExpression result; ASTExpression rhs;
+    result = expfive();
     label_17:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -609,11 +627,11 @@ public class simplejava implements simplejavaConstants {
       }
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case PLUS:{
-        jj_consume_token(PLUS);
+        t = jj_consume_token(PLUS);
         break;
         }
       case MINUS:{
-        jj_consume_token(MINUS);
+        t = jj_consume_token(MINUS);
         break;
         }
       default:
@@ -621,12 +639,15 @@ public class simplejava implements simplejavaConstants {
         jj_consume_token(-1);
         throw new ParseException();
       }
-      expfive();
+      rhs = expfive();
+result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
     }
+{if ("" != null) return result;}
+    throw new Error("Missing return statement in function");
   }
 
-  static final public void expfive() throws ParseException {
-    F();
+  static final public ASTExpression expfive() throws ParseException {Token t; ASTExpression result; ASTExpression rhs;
+    result = F();
     label_18:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -641,11 +662,11 @@ public class simplejava implements simplejavaConstants {
       }
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case TIMES:{
-        jj_consume_token(TIMES);
+        t = jj_consume_token(TIMES);
         break;
         }
       case DIVIDE:{
-        jj_consume_token(DIVIDE);
+        t = jj_consume_token(DIVIDE);
         break;
         }
       default:
@@ -653,19 +674,24 @@ public class simplejava implements simplejavaConstants {
         jj_consume_token(-1);
         throw new ParseException();
       }
-      F();
+      rhs = F();
+result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
     }
+{if ("" != null) return result;}
+    throw new Error("Missing return statement in function");
   }
 
-  static final public void F() throws ParseException {
+  static final public ASTExpression F() throws ParseException {Token t; ASTExpression value;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case MINUS:{
       jj_consume_token(MINUS);
-      jj_consume_token(INTEGER_LITERAL);
+      value = F();
+{if ("" != null) return new ASTOperatorExpression(new ASTIntegerLiteral(0, 0), value, ASTOperatorExpression.MINUS, 0);}
       break;
       }
     case INTEGER_LITERAL:{
-      jj_consume_token(INTEGER_LITERAL);
+      t = jj_consume_token(INTEGER_LITERAL);
+{if ("" != null) return new ASTIntegerLiteral(Integer.parseInt(t.image), t.beginLine);}
       break;
       }
     case TRUE:{
@@ -702,8 +728,9 @@ public class simplejava implements simplejavaConstants {
       }
     case LEFT_PARENTHESIS:{
       jj_consume_token(LEFT_PARENTHESIS);
-      expression();
+      value = expression();
       jj_consume_token(RIGHT_PARENTHESIS);
+{if ("" != null) return value;}
       break;
       }
     default:
@@ -711,6 +738,7 @@ public class simplejava implements simplejavaConstants {
       jj_consume_token(-1);
       throw new ParseException();
     }
+    throw new Error("Missing return statement in function");
   }
 
   static final public void assignmentstatement() throws ParseException {

@@ -174,6 +174,7 @@ public class ASTPrintTree implements  ASTVisitor {
 
 
     public Object VisitIntegerLiteral(ASTIntegerLiteral literal) {
+    Print("I got hit.");
 	Print(Integer.toString(literal.value()));
 	return null;
     }

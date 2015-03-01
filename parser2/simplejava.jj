@@ -76,6 +76,7 @@ TOKEN :
 |	< MINUSMINUS: "--">
 |   < INTEGER_LITERAL: (["0"-"9"])+>
 |	< IDENTIFIER: ["a"-"z"](["a"-"z","0"-"9"])*>
+
 }
 
 void incrementstatement() :
@@ -96,8 +97,18 @@ void program() :
 /*perhaps put a star there to check multiple statements */
 	/* 1) 0 or more class defs	2) 0 or more function defs	3) EOF */
 	((classdefinitions())*) ((functionprototypeordefinition())*) <EOF> 
-//	expression() <EOF>
+//	expression() 
 }
+
+
+
+ASTExpression complete_expression():
+{ASTExpression result;}
+{
+	result = expression() {return result;}
+}
+
+
 
 void functionprototypeordefinition() :
 {}
@@ -230,52 +241,80 @@ void forstatement() :
 		<RIGHT_PARENTHESIS> statement()
 }
 
-void expression() :
-{}
+ASTExpression expression() :
+{Token t;ASTExpression result; ASTExpression rhs;}
 {
-	expone()((<OR>expone())*)
+	result = expone()((((t = <OR>) rhs =expone())
+	{
+		result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
+	})*)
+	{ return result; }
 }
 
-void expone() :
-{}
+ASTExpression expone() :
+{Token t; ASTExpression result; ASTExpression rhs; }
 {
-	exptwo()((<AND>exptwo())*)
+	result = exptwo()((((t= <AND>) rhs = exptwo())
+	{
+		result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
+	}
+	)*)
+	{ return result;}
 }
 
-void exptwo() :
-{}
+ASTExpression exptwo() :
+{Token t; ASTExpression result; ASTExpression rhs;}
 {
-	expthree()((<NOT>expthree())*)
+	result = expthree()((((t=<NOT>) rhs = expthree())
+	{
+		result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
+	})*)
+	{ return result;}
 }
 
-void expthree() :
-{}
+ASTExpression expthree() :
+{Token t; ASTExpression result; ASTExpression rhs;}
 {
-	expfour()(((<EQUAL> | <NOT_EQUAL> | <LESS_THAN> | <LESS_THAN_OR_EQUAL_TO> | <GREATER_THAN> | <GREATER_THAN_OR_EQUAL_TO>) expfour())*)	
+	result = expfour()((((t=<EQUAL> | t=<NOT_EQUAL> | t=<LESS_THAN> | t=<LESS_THAN_OR_EQUAL_TO> | t=<GREATER_THAN> | t=<GREATER_THAN_OR_EQUAL_TO>) rhs = expfour())
+		{
+			result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
+		}
+		)*)
+	{ return result;}	
 }
 
-void expfour() :
-{}
+ASTExpression expfour() :
+{Token t; ASTExpression result; ASTExpression rhs;}
 {
-	expfive()(((<PLUS> | <MINUS>)expfive())*)
+	result = expfive()((((t= <PLUS> | t= <MINUS>) rhs = expfive())
+					{ 
+						result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
+					}
+					)*)
+	{ return result;}
 }
 
-void expfive() :
-{}
+ASTExpression expfive() :
+{Token t; ASTExpression result; ASTExpression rhs;}
 {
-	F()(((<TIMES> | <DIVIDE>)F())*)
+	result = F()((((t = <TIMES> | t= <DIVIDE>) rhs = F())
+					{ 
+					  result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
+					}
+					 )*)
+	{ return result;}
 }
 
-void F() :
-{}
+ASTExpression F() :
+{Token t; ASTExpression value;}
 {
-	<MINUS> <INTEGER_LITERAL>
-|	<INTEGER_LITERAL>
+	<MINUS>value = F() {return new ASTOperatorExpression(new ASTIntegerLiteral(0, 0), value, ASTOperatorExpression.MINUS, 0);}
+|	t = <INTEGER_LITERAL> { return new ASTIntegerLiteral(Integer.parseInt(t.image), t.beginLine);}
 |	<TRUE>
 |	<FALSE>
 |	<IDENTIFIER> ((followsvariablenamesforexpressions())?)
 |	<NEW> <IDENTIFIER> followsnewandidentifier()
-|	<LEFT_PARENTHESIS>expression()<RIGHT_PARENTHESIS>
+|	<LEFT_PARENTHESIS> value = expression()<RIGHT_PARENTHESIS>{return value;}
 }
 
 void assignmentstatement() :
