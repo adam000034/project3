@@ -1,3 +1,4 @@
+void main() {  }
 int abe = 1+2*3+4;	//WORKING (int and semicolon is not showing up in tree because I think they do not)
 1+2*3+4;			//WORKING
 int foo() {

@@ -40,13 +40,13 @@ public class simplejava implements simplejavaConstants {
     jj_consume_token(0);
   }
 
-  static final public void functionprototypeordefinition() throws ParseException {
-    jj_consume_token(IDENTIFIER);
-    jj_consume_token(IDENTIFIER);
+  static final public ASTFunctionDefinition functionprototypeordefinition() throws ParseException {Token type; Token name; ASTFormals formals = new ASTFormals(new ASTFormal("", "No formal parameters.", 1)); ASTStatements body = null; int line; ASTEmptyStatement semicolonchecker = null; ASTStatement itializer = null;
+    type = jj_consume_token(IDENTIFIER);
+    name = jj_consume_token(IDENTIFIER);
     jj_consume_token(LEFT_PARENTHESIS);
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case IDENTIFIER:{
-      formalparameterlist();
+      formals = formalparameterlist();
       break;
       }
     default:
@@ -56,7 +56,7 @@ public class simplejava implements simplejavaConstants {
     jj_consume_token(RIGHT_PARENTHESIS);
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case SEMICOLON:{
-      jj_consume_token(SEMICOLON);
+      semicolonchecker = emptystatement();
       break;
       }
     case LEFT_BRACE:{
@@ -81,7 +81,6 @@ public class simplejava implements simplejavaConstants {
         }
         statement();
       }
-      jj_consume_token(RIGHT_BRACE);
       break;
       }
     default:
@@ -89,6 +88,14 @@ public class simplejava implements simplejavaConstants {
       jj_consume_token(-1);
       throw new ParseException();
     }
+if (semicolonchecker != null) {
+                {if ("" != null) return new ASTPrototype(type.image, name.image, formals, type.beginLine);}
+        }else {
+                itializer = new ASTEmptyStatement(type.beginLine);
+                body = new ASTStatements(itializer);
+                {if ("" != null) return new ASTFunction(type.image, name.image, formals, body, type.beginLine);}
+        }
+    throw new Error("Missing return statement in function");
   }
 
   static final public void functionendingafterparen() throws ParseException {
@@ -129,8 +136,9 @@ public class simplejava implements simplejavaConstants {
     }
   }
 
-  static final public void formalparameterlist() throws ParseException {
-    formalparameter();
+  static final public ASTFormals formalparameterlist() throws ParseException {ASTFormals formals = null; ASTFormal formal = null;
+    formal = formalparameter();
+if (formal != null) {formals = new ASTFormals(formal);}
     label_5:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -143,14 +151,26 @@ public class simplejava implements simplejavaConstants {
         break label_5;
       }
       jj_consume_token(COMMA);
-      formalparameter();
+      formal = formalparameter();
     }
+if (formal != null) {formals.addElement(formal);}
+if (formals != null) {
+                {if ("" != null) return formals;}
+        }
+    throw new Error("Missing return statement in function");
   }
 
-  static final public void formalparameter() throws ParseException {
-    jj_consume_token(IDENTIFIER);
-    jj_consume_token(IDENTIFIER);
+  static final public ASTFormal formalparameter() throws ParseException {ASTFormal returnformal = null; Token type; Token name; boolean checker = false;
+    type = jj_consume_token(IDENTIFIER);
+    name = jj_consume_token(IDENTIFIER);
     variabledeclarations();
+if (checker == true) {
+                returnformal = new ASTFormal(type.image, name.image, type.beginLine);
+        }
+if (returnformal != null) {
+                {if ("" != null) return returnformal;}
+        }
+    throw new Error("Missing return statement in function");
   }
 
   static final public boolean variabledeclarations() throws ParseException {Token onetok = null; Token twotok = null;
@@ -345,7 +365,7 @@ avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beg
         }
       default:
         jj_la1[15] = jj_gen;
-        avariable = variable(/* MAKE SURE TO MAKE CHANGES */
+        avariable = variable(/* MAKE SURE TO MAKE CHANGES, was semicolon before but now is emptystatement because they mean the same thing */
         passedinvariable);
       }
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -360,7 +380,7 @@ avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beg
         jj_la1[16] = jj_gen;
         ;
       }
-      jj_consume_token(SEMICOLON);
+      emptystatement();
 if (expression == null) {{if ("" != null) return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);}} else {{if ("" != null) return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);}}
       break;
       }
@@ -407,8 +427,11 @@ if (expression == null) {{if ("" != null) return new ASTAssignmentStatement(avar
     }
   }
 
-  static final public void emptystatement() throws ParseException {
-    jj_consume_token(SEMICOLON);
+  static final public ASTEmptyStatement emptystatement() throws ParseException {Token semicolontoken; ASTEmptyStatement returnstate;
+    semicolontoken = jj_consume_token(SEMICOLON);
+returnstate = new ASTEmptyStatement(semicolontoken.beginLine);
+{if ("" != null) return returnstate;}
+    throw new Error("Missing return statement in function");
   }
 
   static final public void dowhilestatement() throws ParseException {

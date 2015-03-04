@@ -102,10 +102,18 @@ void program() :
 
 
 
-void functionprototypeordefinition() :
-{}
+ASTFunctionDefinition functionprototypeordefinition() :
+{Token type; Token name; ASTFormals formals = new ASTFormals(new ASTFormal("", "No formal parameters.", 1)); ASTStatements body = null; int line; ASTEmptyStatement semicolonchecker = null; ASTStatement itializer = null;}
 {
-	<IDENTIFIER> <IDENTIFIER> <LEFT_PARENTHESIS> ((formalparameterlist())?) <RIGHT_PARENTHESIS> (<SEMICOLON> | <LEFT_BRACE> ((statement())*) <RIGHT_BRACE>) 
+	
+	type = <IDENTIFIER> name = <IDENTIFIER> <LEFT_PARENTHESIS> ((formals = formalparameterlist())?) <RIGHT_PARENTHESIS> (semicolonchecker = emptystatement() | <LEFT_BRACE> ((statement())*) )
+	{if (semicolonchecker != null) {
+		return new ASTPrototype(type.image, name.image, formals, type.beginLine);
+	}else {
+		itializer = new ASTEmptyStatement(type.beginLine);
+		body = new ASTStatements(itializer);
+		return new ASTFunction(type.image, name.image, formals, body, type.beginLine);
+	}}
 }
 
 void functionendingafterparen() :
@@ -117,16 +125,25 @@ void functionendingafterparen() :
 |	<LEFT_BRACE> ((statement())*) <RIGHT_BRACE>
 }
 
-void formalparameterlist() :
-{}
+ASTFormals formalparameterlist() :
+{ASTFormals formals = null; ASTFormal formal = null;}
 {
-	(formalparameter())((<COMMA>formalparameter())*)
+	(formal = formalparameter()) {if (formal != null) {formals = new ASTFormals(formal);}}((<COMMA> formal = formalparameter())*) {if (formal != null) {formals.addElement(formal);}}
+	{if (formals != null) {
+		return formals;
+	}}
 }
 
-void formalparameter() :
-{}
+ASTFormal formalparameter() :
+{ASTFormal returnformal = null; Token type; Token name; boolean checker = false;}
 {
-	<IDENTIFIER> <IDENTIFIER> variabledeclarations()
+	type = <IDENTIFIER> name = <IDENTIFIER> variabledeclarations()
+	{if (checker == true) {
+		returnformal = new ASTFormal(type.image, name.image, type.beginLine);
+	}}
+	{if (returnformal != null) {
+		return returnformal;
+	}}
 }
 
 boolean variabledeclarations() :
@@ -187,8 +204,8 @@ ASTStatement statement() :
 |	forstatement()
 |	<LEFT_BRACE> ((statement())*) <RIGHT_BRACE>
 |	generaltoken = <IDENTIFIER> {passedinvariable = new ASTBaseVariable(generaltoken.image, generaltoken.beginLine);} ((arrayvariabletoken= <IDENTIFIER>  bracketchecker = variabledeclarations() {avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beginLine);})| (avariable = variable(
-/* MAKE SURE TO MAKE CHANGES */
-passedinvariable))) ((expression = followsvariablenames())?) <SEMICOLON> {if (expression == null) {return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);} else {return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);}}
+/* MAKE SURE TO MAKE CHANGES, was semicolon before but now is emptystatement because they mean the same thing */
+passedinvariable))) ((expression = followsvariablenames())?) emptystatement() {if (expression == null) {return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);} else {return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);}}
 |	emptystatement()
 }
 
@@ -206,10 +223,12 @@ void ifstatement() :
 	<LEFT_PARENTHESIS> expression() (((<AND> expression())?) | ((<OR> expression())?)) <RIGHT_PARENTHESIS> statement() ((LOOKAHEAD(1) <ELSE> statement())?) 
 }
 
-void emptystatement() :
-{}
+ASTEmptyStatement emptystatement() :
+{Token semicolontoken; ASTEmptyStatement returnstate;}
 {
-	<SEMICOLON>
+	semicolontoken = <SEMICOLON>
+	{returnstate = new ASTEmptyStatement(semicolontoken.beginLine);}
+	{return returnstate;}
 }
 
 void dowhilestatement() :
