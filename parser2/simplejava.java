@@ -40,7 +40,7 @@ public class simplejava implements simplejavaConstants {
     jj_consume_token(0);
   }
 
-  static final public ASTFunctionDefinition functionprototypeordefinition() throws ParseException {Token type; Token name; ASTFormals formals = new ASTFormals(new ASTFormal("", "No formal parameters.", 1)); ASTStatements body = null; int line; ASTEmptyStatement semicolonchecker = null; ASTStatement itializer = null;
+  static final public ASTFunctionDefinition functionprototypeordefinition() throws ParseException {Token type; Token name; ASTFormals formals = new ASTFormals(); ASTStatements body = new ASTStatements(); int line; ASTEmptyStatement semicolonchecker = null;
     type = jj_consume_token(IDENTIFIER);
     name = jj_consume_token(IDENTIFIER);
     jj_consume_token(LEFT_PARENTHESIS);
@@ -91,8 +91,6 @@ public class simplejava implements simplejavaConstants {
 if (semicolonchecker != null) {
                 {if ("" != null) return new ASTPrototype(type.image, name.image, formals, type.beginLine);}
         }else {
-                itializer = new ASTEmptyStatement(type.beginLine);
-                body = new ASTStatements(itializer);
                 {if ("" != null) return new ASTFunction(type.image, name.image, formals, body, type.beginLine);}
         }
     throw new Error("Missing return statement in function");

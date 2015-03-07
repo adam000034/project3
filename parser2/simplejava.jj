@@ -103,15 +103,13 @@ void program() :
 
 
 ASTFunctionDefinition functionprototypeordefinition() :
-{Token type; Token name; ASTFormals formals = new ASTFormals(new ASTFormal("", "No formal parameters.", 1)); ASTStatements body = null; int line; ASTEmptyStatement semicolonchecker = null; ASTStatement itializer = null;}
+{Token type; Token name; ASTFormals formals = new ASTFormals(); ASTStatements body = new ASTStatements(); int line; ASTEmptyStatement semicolonchecker = null;}
 {
 	
 	type = <IDENTIFIER> name = <IDENTIFIER> <LEFT_PARENTHESIS> ((formals = formalparameterlist())?) <RIGHT_PARENTHESIS> (semicolonchecker = emptystatement() | <LEFT_BRACE> ((statement())*) )
 	{if (semicolonchecker != null) {
 		return new ASTPrototype(type.image, name.image, formals, type.beginLine);
 	}else {
-		itializer = new ASTEmptyStatement(type.beginLine);
-		body = new ASTStatements(itializer);
 		return new ASTFunction(type.image, name.image, formals, body, type.beginLine);
 	}}
 }
