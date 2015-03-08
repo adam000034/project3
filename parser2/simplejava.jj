@@ -193,7 +193,8 @@ void classdefinitions() :
 
 ASTStatement statement() :
 /* POSSIBLE PROBLEMS WITH INTIALIZING ARRAYVARIABLETOKEN TO BE NULL */
-{ASTAssignmentStatement assignstate; ASTVariable avariable = null; Token arrayvariabletoken = null; ASTExpression expression = null; boolean bracketchecker= false; Token generaltoken; ASTVariable passedinvariable; ASTStatements returner = new ASTStatements(); ASTVariableDefStatement defstatement = null; ASTVariable bvariable = null;}
+{ASTAssignmentStatement assignstate; ASTVariable avariable = null; Token arrayvariabletoken = null; ASTExpression expression = null; boolean bracketchecker= false; Token generaltoken; ASTVariable passedinvariable; ASTStatements returner = new ASTStatements();
+ASTVariable bvariable = null;}
 {
 	dowhilestatement()
 |	<RETURN> expression() <SEMICOLON>
@@ -203,7 +204,9 @@ ASTStatement statement() :
 |	<LEFT_BRACE> ((statement())*) <RIGHT_BRACE>
 |	generaltoken = <IDENTIFIER> {passedinvariable = new ASTBaseVariable(generaltoken.image, generaltoken.beginLine);} ((arrayvariabletoken= <IDENTIFIER>  bracketchecker = variabledeclarations() {avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beginLine);})| (bvariable = variable(
 /* MAKE SURE TO MAKE CHANGES, was semicolon before but now is emptystatement because they mean the same thing */
-passedinvariable))) ((expression = followsvariablenames())?) emptystatement() {if (expression == null && bvariable == null) {return returner;} else if (bvariable == null) {return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);} else if (expression == null && avariable == null) { return new ASTVariableDefStatement(generaltoken.image, bvariable.image, generaltoken.beginLine);} else if (avariable = null) {return new ASTVariableDefStatement(generaltoken.image, bvariable.image, generaltoken.beginLine);}}
+passedinvariable))) ((expression = followsvariablenames())?) emptystatement() {if (bracketchecker == false && bvariable == null && expression == null) {
+	return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, generaltoken.beginLine);
+}if (expression == null) {return null;} else {return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);} }
 |	emptystatement()
 }
 
@@ -362,6 +365,7 @@ ASTVariable followsvariables(ASTVariable astvar) :
 ASTExpression followsvariablenames() :
 {ASTExpression value;}
 {
+	/* How to prevent from class types from getting the same rules as variables*/
 	/*<IDENTIFIER> ((followsvariablenames())*)*/ 
 	<LEFT_PARENTHESIS> ((expressionlist())?) <RIGHT_PARENTHESIS> ((followsvariablenames())?)
 |	value = assignmentstatement() {return value;} 

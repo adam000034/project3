@@ -298,7 +298,8 @@ if (onetok != null && twotok != null) {{if ("" != null) return true;}} else {{if
     jj_consume_token(RIGHT_BRACE);
   }
 
-  static final public ASTStatement statement() throws ParseException {ASTAssignmentStatement assignstate; ASTVariable avariable = null; Token arrayvariabletoken = null; ASTExpression expression = null; boolean bracketchecker= false; Token generaltoken; ASTVariable passedinvariable; ASTStatements returner = new ASTStatements(); ASTVariableDefStatement defstatement = null; ASTVariable bvariable = null;
+  static final public ASTStatement statement() throws ParseException {ASTAssignmentStatement assignstate; ASTVariable avariable = null; Token arrayvariabletoken = null; ASTExpression expression = null; boolean bracketchecker= false; Token generaltoken; ASTVariable passedinvariable; ASTStatements returner = new ASTStatements();
+ASTVariable bvariable = null;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case DO:{
       dowhilestatement();
@@ -380,7 +381,9 @@ avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beg
         ;
       }
       emptystatement();
-if (expression == null && bvariable == null) {{if ("" != null) return returner;}} else if (bvariable == null) {{if ("" != null) return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);}} else if (expression == null && avariable == null) { {if ("" != null) return new ASTVariableDefStatement(generaltoken.image, bvariable.image, generaltoken.beginLine);}} else if (avariable = null) {{if ("" != null) return new ASTVariableDefStatement(generaltoken.image, bvariable.image, generaltoken.beginLine);}}
+if (bracketchecker == false && bvariable == null && expression == null) {
+        {if ("" != null) return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, generaltoken.beginLine);}
+}if (expression == null) {{if ("" != null) return null;}} else {{if ("" != null) return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);}}
       break;
       }
     case SEMICOLON:{
