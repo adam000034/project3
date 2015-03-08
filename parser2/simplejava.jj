@@ -75,7 +75,7 @@ TOKEN :
 |	< ADD: "++">
 |	< MINUSMINUS: "--">
 |   < INTEGER_LITERAL: (["0"-"9"])+>
-|	< IDENTIFIER: ["a"-"z"](["a"-"z","0"-"9"])*>
+|	< IDENTIFIER: ["a"-"z", "_"](["_", "a"-"z","0"-"9"])*>
 
 }
 
@@ -317,11 +317,13 @@ ASTExpression expone() :
 ASTExpression exptwo() :
 {Token t; ASTExpression result; ASTExpression rhs;}
 {
-	result = expthree()((((t=<NOT>) rhs = expthree())
+	/*result = expthree()((((t=<NOT>) rhs = expthree())
 	{
 		result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
 	})*)
-	{ return result;}
+	{ return result;}*/
+	
+	((<NOT>)?) expthree()
 }
 
 ASTExpression expthree() :
@@ -415,7 +417,8 @@ ASTVariable followsvariablenamesforexpressions(ASTVariable variable) :
 /* Double question mark might be overkill, question mark here and it's caller has ? as well */
 	variabletoken = <IDENTIFIER> {basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);}((followsvariablenamesforexpressions(basevar))*) 
 |	((<PERIOD> variabletoken = <IDENTIFIER> {basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);})+)((followsvariablenamesforexpressions(basevar))?) {return new ASTClassVariable(variable, variabletoken.image, variabletoken.beginLine);}
-|	<LEFT_PARENTHESIS> ((expressionlist())?) <RIGHT_PARENTHESIS> ((followsvariablenamesforexpressions(basevar))?)
+//|	<LEFT_PARENTHESIS> ((expressionlist())?) <RIGHT_PARENTHESIS> ((followsvariablenamesforexpressions(basevar))?)
+|	<LEFT_PARENTHESIS> ((expressionlist())?) <RIGHT_PARENTHESIS> ((((<PERIOD> <IDENTIFIER>)+) ((followsvariablenamesforexpressions())?))?)
 |	((<LEFT_BRACKET> expression() <RIGHT_BRACKET>)+) ((followsvariablenamesforexpressions(basevar))?) 
 |	incrementstatements()
 }
