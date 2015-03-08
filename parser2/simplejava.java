@@ -192,7 +192,7 @@ counter++;
     throw new Error("Missing return statement in function");
   }
 
-  static final public void variabledefinitions() throws ParseException {
+  static final public ASTInstanceVariableDefs variabledefinitions() throws ParseException {ASTInstanceVariableDefs variabledefs = new ASTInstanceVariableDefs(); ASTInstanceVariableDef variabledef = null; int counter = 0; Token type; Token name;
     label_7:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -204,11 +204,20 @@ counter++;
         jj_la1[9] = jj_gen;
         break label_7;
       }
-      jj_consume_token(IDENTIFIER);
-      jj_consume_token(IDENTIFIER);
-      variabledeclarations();
+      type = jj_consume_token(IDENTIFIER);
+      name = jj_consume_token(IDENTIFIER);
+      counter = variabledeclarations();
       jj_consume_token(SEMICOLON);
+if (counter == 0) {
+                variabledef = new ASTInstanceVariableDef(type.image, name.image, type.beginLine);
+                variabledefs.addElement(variabledef);
+        } else {
+                variabledef = new ASTInstanceVariableDef(type.image, name.image, counter, type.beginLine);
+                variabledefs.addElement(variabledef);
+        }
     }
+{if ("" != null) return variabledefs;}
+    throw new Error("Missing return statement in function");
   }
 
   static final public void expressionlist() throws ParseException {
@@ -272,7 +281,7 @@ counter++;
     jj_consume_token(LEFT_BRACKET);
     label_10:
     while (true) {
-      followsbrackets();
+      followsbracketsone();
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case TRUE:
       case FALSE:
@@ -291,16 +300,19 @@ counter++;
     }
   }
 
-  static final public void classdefinitions() throws ParseException {
+  static final public ASTClass classdefinitions() throws ParseException {ASTClass astclass = null; Token stringt; ASTInstanceVariableDefs variabledefs = null;
     jj_consume_token(CLASS);
-    jj_consume_token(IDENTIFIER);
+    stringt = jj_consume_token(IDENTIFIER);
     jj_consume_token(LEFT_BRACE);
-    variabledefinitions();
+    variabledefs = variabledefinitions();
     jj_consume_token(RIGHT_BRACE);
+astclass = new ASTClass(stringt.image, variabledefs, stringt.beginLine);
+{if ("" != null) return astclass;}
+    throw new Error("Missing return statement in function");
   }
 
   static final public ASTStatement statement() throws ParseException {ASTAssignmentStatement assignstate; ASTVariable avariable = null; Token arrayvariabletoken = null; ASTExpression expression = null; int bracketcounter= 0; Token generaltoken; ASTVariable passedinvariable; ASTStatements returner = new ASTStatements();
-ASTVariable bvariable = null;
+ASTVariable bvariable = null; ASTBaseVariable basevariable = null;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case DO:{
       dowhilestatement();
@@ -384,13 +396,26 @@ avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beg
       emptystatement();
 if (bracketcounter == 0 && bvariable == null && expression == null) {
         {if ("" != null) return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, generaltoken.beginLine);}
-} if (bracketcounter == 0 && bvariable == null && expression != null) {
+}
+if (bracketcounter == 0 && bvariable == null && expression != null && avariable == null) {
+        basevariable = new ASTBaseVariable(generaltoken.image, generaltoken.beginLine);
+        {if ("" != null) return new ASTAssignmentStatement(basevariable, expression, generaltoken.beginLine);}
+}
+if (bracketcounter != 0 && bvariable != null && expression != null && avariable == null) {
+        basevariable = new ASTBaseVariable(generaltoken.image, generaltoken.beginLine);
+        {if ("" != null) return new ASTAssignmentStatement(basevariable, expression, generaltoken.beginLine);}
+}
+if (bracketcounter == 0 && bvariable == null && expression != null) {
         {if ("" != null) return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, expression,generaltoken.beginLine);}
 }
 if (bracketcounter != 0 && bvariable == null && expression == null) {
 
         {if ("" != null) return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, bracketcounter,generaltoken.beginLine);}
 }
+if (bracketcounter != 0 && bvariable == null && expression != null) {
+        {if ("" != null) return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, bracketcounter, expression, generaltoken.beginLine);}
+}
+
 if (expression == null) {{if ("" != null) return null;}} else {{if ("" != null) return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);}}
       break;
       }
@@ -717,7 +742,7 @@ result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
     throw new Error("Missing return statement in function");
   }
 
-  static final public ASTExpression F() throws ParseException {Token t; ASTExpression value = null;
+  static final public ASTExpression F() throws ParseException {Token t; ASTExpression value = null; ASTVariable variable = null; ASTVariableExpression variableexpression= null;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case MINUS:{
       jj_consume_token(MINUS);
@@ -741,7 +766,8 @@ result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
       break;
       }
     case IDENTIFIER:{
-      jj_consume_token(IDENTIFIER);
+      t = jj_consume_token(IDENTIFIER);
+variable = new ASTBaseVariable(t.image, t.beginLine);
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case LEFT_BRACKET:
       case PERIOD:
@@ -749,19 +775,22 @@ result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
       case ADD:
       case MINUSMINUS:
       case IDENTIFIER:{
-        followsvariablenamesforexpressions();
+        followsvariablenamesforexpressions(variable);
         break;
         }
       default:
         jj_la1[36] = jj_gen;
         ;
       }
+variableexpression = new ASTVariableExpression(variable, variable.line());
+{if ("" != null) return variableexpression;}
       break;
       }
     case NEW:{
       jj_consume_token(NEW);
       t = jj_consume_token(IDENTIFIER);
       value = followsnewandidentifier(t);
+{if ("" != null) return value;}
       break;
       }
     case LEFT_PARENTHESIS:{
@@ -786,11 +815,12 @@ result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
     throw new Error("Missing return statement in function");
   }
 
-  static final public ASTExpression followsnewandidentifier(Token t) throws ParseException {int bracketcounter = 0;
+  static final public ASTExpression followsnewandidentifier(Token t) throws ParseException {ASTExpression returnresult = null;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case LEFT_BRACKET:{
       jj_consume_token(LEFT_BRACKET);
-      bracketcounter = followsbrackets();
+      returnresult = followsbrackets(t);
+{if ("" != null) return returnresult;}
       break;
       }
     case LEFT_PARENTHESIS:{
@@ -825,14 +855,14 @@ result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
     }
   }
 
-  static final public ASTVariable followsvariables(ASTVariable astvar) throws ParseException {ASTArrayVariable arrayvar; ASTExpression express; ASTVariable nextvariable; Token variable;
+  static final public ASTVariable followsvariables(ASTVariable astvar) throws ParseException {ASTArrayVariable arrayvar; ASTExpression express; ASTVariable nextvariable; Token variabletoken = null;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case PERIOD:{
       label_19:
       while (true) {
         jj_consume_token(PERIOD);
-        variable = jj_consume_token(IDENTIFIER);
-nextvariable = new ASTBaseVariable(variable.image, variable.beginLine);
+        variabletoken = jj_consume_token(IDENTIFIER);
+nextvariable = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case PERIOD:{
           ;
@@ -853,7 +883,7 @@ nextvariable = new ASTBaseVariable(variable.image, variable.beginLine);
         jj_la1[41] = jj_gen;
         ;
       }
-{if ("" != null) return new ASTClassVariable(astvar, variable.image, variable.beginLine);}
+{if ("" != null) return new ASTClassVariable(astvar, variabletoken.image, variabletoken.beginLine);}
       break;
       }
     case LEFT_BRACKET:{
@@ -861,7 +891,7 @@ nextvariable = new ASTBaseVariable(variable.image, variable.beginLine);
       while (true) {
         jj_consume_token(LEFT_BRACKET);
         express = expression();
-        variable = jj_consume_token(RIGHT_BRACKET);
+        variabletoken = jj_consume_token(RIGHT_BRACKET);
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case LEFT_BRACKET:{
           ;
@@ -883,7 +913,7 @@ astvar = null;
         jj_la1[43] = jj_gen;
         ;
       }
-{if ("" != null) return new ASTArrayVariable(astvar, express, variable.beginLine);}
+{if ("" != null) return new ASTArrayVariable(astvar, express, variabletoken.beginLine);}
       break;
       }
     default:
@@ -946,10 +976,12 @@ astvar = null;
     throw new Error("Missing return statement in function");
   }
 
-  static final public void followsvariablenamesforexpressions() throws ParseException {
+  static final public ASTVariable followsvariablenamesforexpressions(ASTVariable variable) throws ParseException {ASTExpression result = null; ASTArrayVariable arrayvar = null; ASTBaseVariable basevar = null; Token variabletoken;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case IDENTIFIER:{
-      jj_consume_token(IDENTIFIER);
+      /* Double question mark might be overkill, question mark here and it's caller has ? as well */
+              variabletoken = jj_consume_token(IDENTIFIER);
+basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);
       label_21:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -966,7 +998,7 @@ astvar = null;
           jj_la1[48] = jj_gen;
           break label_21;
         }
-        followsvariablenamesforexpressions();
+        followsvariablenamesforexpressions(basevar);
       }
       break;
       }
@@ -974,7 +1006,8 @@ astvar = null;
       label_22:
       while (true) {
         jj_consume_token(PERIOD);
-        jj_consume_token(IDENTIFIER);
+        variabletoken = jj_consume_token(IDENTIFIER);
+basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case PERIOD:{
           ;
@@ -992,13 +1025,14 @@ astvar = null;
       case ADD:
       case MINUSMINUS:
       case IDENTIFIER:{
-        followsvariablenamesforexpressions();
+        followsvariablenamesforexpressions(basevar);
         break;
         }
       default:
         jj_la1[50] = jj_gen;
         ;
       }
+{if ("" != null) return new ASTClassVariable(variable, variabletoken.image, variabletoken.beginLine);}
       break;
       }
     case LEFT_PARENTHESIS:{
@@ -1026,7 +1060,7 @@ astvar = null;
       case ADD:
       case MINUSMINUS:
       case IDENTIFIER:{
-        followsvariablenamesforexpressions();
+        followsvariablenamesforexpressions(basevar);
         break;
         }
       default:
@@ -1058,7 +1092,7 @@ astvar = null;
       case ADD:
       case MINUSMINUS:
       case IDENTIFIER:{
-        followsvariablenamesforexpressions();
+        followsvariablenamesforexpressions(basevar);
         break;
         }
       default:
@@ -1077,9 +1111,17 @@ astvar = null;
       jj_consume_token(-1);
       throw new ParseException();
     }
+    throw new Error("Missing return statement in function");
   }
 
-  static final public ASTExpression followsbrackets() throws ParseException {int counter = 0; ASTExpression value = null;
+  static final public void followsbracketsone() throws ParseException {
+    expression();
+    jj_consume_token(RIGHT_BRACKET);
+    jj_consume_token(LEFT_BRACKET);
+    jj_consume_token(RIGHT_BRACKET);
+  }
+
+  static final public ASTExpression followsbrackets(Token t) throws ParseException {int counter = 0; ASTExpression value = null;
     value = expression();
     jj_consume_token(RIGHT_BRACKET);
 counter++;

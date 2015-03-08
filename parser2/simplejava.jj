@@ -154,10 +154,20 @@ int variabledeclarations() :
 	{return counter;}
 }
 
-void variabledefinitions() :
-{}
+ASTInstanceVariableDefs variabledefinitions() :
+{ASTInstanceVariableDefs variabledefs = new ASTInstanceVariableDefs(); ASTInstanceVariableDef variabledef = null; int counter = 0; Token type; Token name;}
 {
-	((<IDENTIFIER> <IDENTIFIER> (variabledeclarations())<SEMICOLON>)*)
+	(((type = <IDENTIFIER> name = <IDENTIFIER> (counter = variabledeclarations())<SEMICOLON>){
+	if (counter == 0) {
+		variabledef = new ASTInstanceVariableDef(type.image, name.image, type.beginLine);
+		variabledefs.addElement(variabledef);
+	} else {
+		variabledef = new ASTInstanceVariableDef(type.image, name.image, counter, type.beginLine);
+		variabledefs.addElement(variabledef);
+	}	
+
+	})*)
+	{return variabledefs;}
 }
 
 void expressionlist() :
@@ -188,17 +198,19 @@ void followsclassdefinitionstypes() :
 
 }
 
-void classdefinitions() :
-{}
+ASTClass classdefinitions() :
+{ASTClass astclass = null; Token stringt; ASTInstanceVariableDefs variabledefs = null;}
 {
 	/* Get value of identifier so that identifier will not show up in the body */
-	<CLASS> <IDENTIFIER> <LEFT_BRACE> variabledefinitions() <RIGHT_BRACE>
+	<CLASS> stringt = <IDENTIFIER> <LEFT_BRACE> variabledefs = variabledefinitions() <RIGHT_BRACE>
+	{astclass = new ASTClass(stringt.image, variabledefs, stringt.beginLine);}
+	{return astclass;}
 }
 
 ASTStatement statement() :
 /* POSSIBLE PROBLEMS WITH INTIALIZING ARRAYVARIABLETOKEN TO BE NULL */
 {ASTAssignmentStatement assignstate; ASTVariable avariable = null; Token arrayvariabletoken = null; ASTExpression expression = null; int bracketcounter= 0; Token generaltoken; ASTVariable passedinvariable; ASTStatements returner = new ASTStatements();
-ASTVariable bvariable = null;}
+ASTVariable bvariable = null; ASTBaseVariable basevariable = null;}
 {
 	dowhilestatement()
 |	<RETURN> expression() <SEMICOLON>
@@ -210,13 +222,26 @@ ASTVariable bvariable = null;}
 /* MAKE SURE TO MAKE CHANGES, was semicolon before but now is emptystatement because they mean the same thing */
 passedinvariable))) ((expression = followsvariablenames())?) emptystatement() {if (bracketcounter == 0 && bvariable == null && expression == null) {
 	return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, generaltoken.beginLine);
-} if (bracketcounter == 0 && bvariable == null && expression != null) {
+} 
+if (bracketcounter == 0 && bvariable == null && expression != null && avariable == null) {
+	basevariable = new ASTBaseVariable(generaltoken.image, generaltoken.beginLine);
+	return new ASTAssignmentStatement(basevariable, expression, generaltoken.beginLine);
+}
+if (bracketcounter != 0 && bvariable != null && expression != null && avariable == null) {
+	basevariable = new ASTBaseVariable(generaltoken.image, generaltoken.beginLine);
+	return new ASTAssignmentStatement(basevariable, expression, generaltoken.beginLine);
+}
+if (bracketcounter == 0 && bvariable == null && expression != null) {
 	return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, expression,generaltoken.beginLine);
 }
 if (bracketcounter != 0 && bvariable == null && expression == null) {
 
 	return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, bracketcounter,generaltoken.beginLine);
 }
+if (bracketcounter != 0 && bvariable == null && expression != null) {
+	return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, bracketcounter, expression, generaltoken.beginLine);
+}
+
 if (expression == null) {return null;} else {return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);} }
 |	emptystatement()
 }
@@ -333,14 +358,14 @@ ASTExpression expfive() :
 }
 
 ASTExpression F() :
-{Token t; ASTExpression value = null;}
+{Token t; ASTExpression value = null; ASTVariable variable = null; ASTVariableExpression variableexpression= null;}
 {
 	<MINUS>value = F() {return new ASTOperatorExpression(new ASTIntegerLiteral(0, 0), value, ASTOperatorExpression.MINUS, 0);}
 |	t = <INTEGER_LITERAL> { return new ASTIntegerLiteral(Integer.parseInt(t.image), t.beginLine);}
 |	t = <TRUE> { return new ASTBooleanLiteral(Boolean.parseBoolean(t.image), t.beginLine);}
 |	t = <FALSE> {return new ASTBooleanLiteral(Boolean.parseBoolean(t.image), t.beginLine);}
-|	<IDENTIFIER> ((followsvariablenamesforexpressions())?)
-|	<NEW> t = <IDENTIFIER> value = followsnewandidentifier(t) 
+|	t = <IDENTIFIER> {variable = new ASTBaseVariable(t.image, t.beginLine);} ((followsvariablenamesforexpressions(variable))?) {variableexpression = new ASTVariableExpression(variable, variable.line());}	{return variableexpression;}
+|	<NEW> t = <IDENTIFIER> value = followsnewandidentifier(t) {return value;}
 |	<LEFT_PARENTHESIS> value = expression()<RIGHT_PARENTHESIS>{return value;}
 }
 
@@ -352,9 +377,9 @@ ASTExpression assignmentstatement() :
 }
 
 ASTExpression followsnewandidentifier(Token t) :
-{int bracketcounter = 0;}
+{ASTExpression returnresult = null;}
 {
-	<LEFT_BRACKET> (bracketcounter = followsbrackets())
+	<LEFT_BRACKET> (returnresult = followsbrackets(t)) {return returnresult;}
 |	<LEFT_PARENTHESIS><RIGHT_PARENTHESIS> {return new ASTNewClassExpression(t.image, t.beginLine);}
 	{return null;}
 }
@@ -367,18 +392,16 @@ void incrementstatements() :
 }
 
 ASTVariable followsvariables(ASTVariable astvar) :
-{ASTArrayVariable arrayvar; ASTExpression express; ASTVariable nextvariable; Token variable;}
+{ASTArrayVariable arrayvar; ASTExpression express; ASTVariable nextvariable; Token variabletoken = null;}
 {
-	((<PERIOD> variable = <IDENTIFIER> {nextvariable = new ASTBaseVariable(variable.image, variable.beginLine);})+) ((followsvariables(nextvariable))?) {return new ASTClassVariable(astvar, variable.image, variable.beginLine);}
+	((<PERIOD> variabletoken = <IDENTIFIER> {nextvariable = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);})+) ((followsvariables(nextvariable))?) {return new ASTClassVariable(astvar, variabletoken.image, variabletoken.beginLine);}
 	//TOKEN USED IN SECOND CASE JUST TO CAPTURE LINE NUMBER FOR NOW
-|	((<LEFT_BRACKET> express = expression() variable = <RIGHT_BRACKET>)+) {astvar = null;} ((followsvariables(astvar))?) {return new ASTArrayVariable(astvar, express, variable.beginLine);}
+|	((<LEFT_BRACKET> express = expression() variabletoken = <RIGHT_BRACKET>)+) {astvar = null;} ((followsvariables(astvar))?) {return new ASTArrayVariable(astvar, express, variabletoken.beginLine);}
 }
 
 ASTExpression followsvariablenames() :
 {ASTExpression value;}
 {
-	/* How to prevent from class types from getting the same rules as variables*/
-	/*<IDENTIFIER> ((followsvariablenames())*)*/ 
 	<LEFT_PARENTHESIS> ((expressionlist())?) <RIGHT_PARENTHESIS> ((followsvariablenames())?)
 |	value = assignmentstatement() {return value;} 
 /* Need a way to make sure that amount of brackets are matched on left side with number on right side */
@@ -386,16 +409,14 @@ ASTExpression followsvariablenames() :
 |	incrementstatements()
 }
 
-void followsvariablenamesforexpressions() :
-{}
+ASTVariable followsvariablenamesforexpressions(ASTVariable variable) :
+{ASTExpression result = null; ASTArrayVariable arrayvar = null; ASTBaseVariable basevar = null; Token variabletoken;}
 {
-	/* How to prevent from class types from getting the same rules as variables*/
-	<IDENTIFIER> ((followsvariablenamesforexpressions())*) 
-|	((<PERIOD> <IDENTIFIER>)+) ((followsvariablenamesforexpressions())?)
-|	<LEFT_PARENTHESIS> ((expressionlist())?) <RIGHT_PARENTHESIS> ((followsvariablenamesforexpressions())?)
-/* Need a way to make sure that amount of brackets are matched on left side with number on right side */
-/*|	variabledeclarationstatemementsbrackets() ((followsvariablenamesforexpressions())?)*/
-|	((<LEFT_BRACKET> expression() <RIGHT_BRACKET>)+) ((followsvariablenamesforexpressions())?) 
+/* Double question mark might be overkill, question mark here and it's caller has ? as well */
+	variabletoken = <IDENTIFIER> {basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);}((followsvariablenamesforexpressions(basevar))*) 
+|	((<PERIOD> variabletoken = <IDENTIFIER> {basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);})+)((followsvariablenamesforexpressions(basevar))?) {return new ASTClassVariable(variable, variabletoken.image, variabletoken.beginLine);}
+|	<LEFT_PARENTHESIS> ((expressionlist())?) <RIGHT_PARENTHESIS> ((followsvariablenamesforexpressions(basevar))?)
+|	((<LEFT_BRACKET> expression() <RIGHT_BRACKET>)+) ((followsvariablenamesforexpressions(basevar))?) 
 |	incrementstatements()
 }
 
@@ -405,7 +426,7 @@ void followsbracketsone() :
 	expression() <RIGHT_BRACKET> (((<LEFT_BRACKET><RIGHT_BRACKET>)))
 }
 
-ASTExpression followsbrackets() :
+ASTExpression followsbrackets(Token t) :
 {int counter = 0; ASTExpression value = null;}
 {
 	value = expression() <RIGHT_BRACKET> {counter++;}(((<LEFT_BRACKET><RIGHT_BRACKET>){counter++;})*) {return new ASTNewArrayExpression(t.image, value, counter, t.beginLine);}

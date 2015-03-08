@@ -1,4 +1,10 @@
-oid main() { int x; int y = 3; int z[][][][][]; int x[][] = new int[3][]; }	//WORKING
+void main() { C x = new C(); }
+class C { bar y[][][][][][][][][][]; int x; boolean z; boolean w[][][]; } //WORKING
+class bar { foo x[][][]; boolean z; }  //WORKING
+class foo { int x; int z[];}	//WORKING
+
+x[3][4].foo[8].bar[x.y][3].z.w.x[x.y.z] = y;
+void main() { int x; int y = 3; int z[][][][][]; int x[][] = new int[3][]; x = 3; x[3][4].foo[8].bar[x.y][3].z.w.x[x.y.z] = y; }	//WORKING
 void main() { }		//WORKING
 int x;				//WORKING 
 

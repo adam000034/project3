@@ -1,4 +1,4 @@
-public class ASTBaseVariable extends ASTVariable {
+    public class ASTBaseVariable extends ASTVariable {
 
     public ASTBaseVariable(String name, int line) {
 	name_ = name;
