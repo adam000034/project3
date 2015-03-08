@@ -103,10 +103,10 @@ void program() :
 
 
 ASTFunctionDefinition functionprototypeordefinition() :
-{Token type; Token name; ASTFormals formals = new ASTFormals(); ASTStatements body = new ASTStatements(); int line; ASTEmptyStatement semicolonchecker = null;}
+{Token type; Token name; ASTFormals formals = new ASTFormals(); ASTStatements body = new ASTStatements(); int line; ASTEmptyStatement semicolonchecker = null; ASTStatement returnedstatement = null;}
 {
 	
-	type = <IDENTIFIER> name = <IDENTIFIER> <LEFT_PARENTHESIS> ((formals = formalparameterlist())?) <RIGHT_PARENTHESIS> (semicolonchecker = emptystatement() | <LEFT_BRACE> ((statement())*) )
+	type = <IDENTIFIER> name = <IDENTIFIER> <LEFT_PARENTHESIS> ((formals = formalparameterlist())?) <RIGHT_PARENTHESIS> (semicolonchecker = emptystatement() | <LEFT_BRACE> ((returnedstatement = statement() {body.addElement(returnedstatement);})*) )
 	{if (semicolonchecker != null) {
 		return new ASTPrototype(type.image, name.image, formals, type.beginLine);
 	}else {
@@ -193,7 +193,7 @@ void classdefinitions() :
 
 ASTStatement statement() :
 /* POSSIBLE PROBLEMS WITH INTIALIZING ARRAYVARIABLETOKEN TO BE NULL */
-{ASTAssignmentStatement assignstate; ASTVariable avariable; Token arrayvariabletoken = null; ASTExpression expression = null; boolean bracketchecker= false; Token generaltoken; ASTVariable passedinvariable;}
+{ASTAssignmentStatement assignstate; ASTVariable avariable = null; Token arrayvariabletoken = null; ASTExpression expression = null; boolean bracketchecker= false; Token generaltoken; ASTVariable passedinvariable; ASTStatements returner = new ASTStatements(); ASTVariableDefStatement defstatement = null; ASTVariable bvariable = null;}
 {
 	dowhilestatement()
 |	<RETURN> expression() <SEMICOLON>
@@ -201,9 +201,9 @@ ASTStatement statement() :
 |	<IF> ifstatement()
 |	forstatement()
 |	<LEFT_BRACE> ((statement())*) <RIGHT_BRACE>
-|	generaltoken = <IDENTIFIER> {passedinvariable = new ASTBaseVariable(generaltoken.image, generaltoken.beginLine);} ((arrayvariabletoken= <IDENTIFIER>  bracketchecker = variabledeclarations() {avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beginLine);})| (avariable = variable(
+|	generaltoken = <IDENTIFIER> {passedinvariable = new ASTBaseVariable(generaltoken.image, generaltoken.beginLine);} ((arrayvariabletoken= <IDENTIFIER>  bracketchecker = variabledeclarations() {avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beginLine);})| (bvariable = variable(
 /* MAKE SURE TO MAKE CHANGES, was semicolon before but now is emptystatement because they mean the same thing */
-passedinvariable))) ((expression = followsvariablenames())?) emptystatement() {if (expression == null) {return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);} else {return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);}}
+passedinvariable))) ((expression = followsvariablenames())?) emptystatement() {if (expression == null && bvariable == null) {return returner;} else if (bvariable == null) {return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);} else if (expression == null && avariable == null) { return new ASTVariableDefStatement(generaltoken.image, bvariable.image, generaltoken.beginLine);} else if (avariable = null) {return new ASTVariableDefStatement(generaltoken.image, bvariable.image, generaltoken.beginLine);}}
 |	emptystatement()
 }
 
@@ -362,7 +362,6 @@ ASTVariable followsvariables(ASTVariable astvar) :
 ASTExpression followsvariablenames() :
 {ASTExpression value;}
 {
-	/* How to prevent from class types from getting the same rules as variables*/
 	/*<IDENTIFIER> ((followsvariablenames())*)*/ 
 	<LEFT_PARENTHESIS> ((expressionlist())?) <RIGHT_PARENTHESIS> ((followsvariablenames())?)
 |	value = assignmentstatement() {return value;} 

@@ -40,7 +40,7 @@ public class simplejava implements simplejavaConstants {
     jj_consume_token(0);
   }
 
-  static final public ASTFunctionDefinition functionprototypeordefinition() throws ParseException {Token type; Token name; ASTFormals formals = new ASTFormals(); ASTStatements body = new ASTStatements(); int line; ASTEmptyStatement semicolonchecker = null;
+  static final public ASTFunctionDefinition functionprototypeordefinition() throws ParseException {Token type; Token name; ASTFormals formals = new ASTFormals(); ASTStatements body = new ASTStatements(); int line; ASTEmptyStatement semicolonchecker = null; ASTStatement returnedstatement = null;
     type = jj_consume_token(IDENTIFIER);
     name = jj_consume_token(IDENTIFIER);
     jj_consume_token(LEFT_PARENTHESIS);
@@ -79,7 +79,8 @@ public class simplejava implements simplejavaConstants {
           jj_la1[3] = jj_gen;
           break label_3;
         }
-        statement();
+        returnedstatement = statement();
+body.addElement(returnedstatement);
       }
       break;
       }
@@ -297,7 +298,7 @@ if (onetok != null && twotok != null) {{if ("" != null) return true;}} else {{if
     jj_consume_token(RIGHT_BRACE);
   }
 
-  static final public ASTStatement statement() throws ParseException {ASTAssignmentStatement assignstate; ASTVariable avariable; Token arrayvariabletoken = null; ASTExpression expression = null; boolean bracketchecker= false; Token generaltoken; ASTVariable passedinvariable;
+  static final public ASTStatement statement() throws ParseException {ASTAssignmentStatement assignstate; ASTVariable avariable = null; Token arrayvariabletoken = null; ASTExpression expression = null; boolean bracketchecker= false; Token generaltoken; ASTVariable passedinvariable; ASTStatements returner = new ASTStatements(); ASTVariableDefStatement defstatement = null; ASTVariable bvariable = null;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case DO:{
       dowhilestatement();
@@ -363,7 +364,7 @@ avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beg
         }
       default:
         jj_la1[15] = jj_gen;
-        avariable = variable(/* MAKE SURE TO MAKE CHANGES, was semicolon before but now is emptystatement because they mean the same thing */
+        bvariable = variable(/* MAKE SURE TO MAKE CHANGES, was semicolon before but now is emptystatement because they mean the same thing */
         passedinvariable);
       }
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -379,7 +380,7 @@ avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beg
         ;
       }
       emptystatement();
-if (expression == null) {{if ("" != null) return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);}} else {{if ("" != null) return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);}}
+if (expression == null && bvariable == null) {{if ("" != null) return returner;}} else if (bvariable == null) {{if ("" != null) return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);}} else if (expression == null && avariable == null) { {if ("" != null) return new ASTVariableDefStatement(generaltoken.image, bvariable.image, generaltoken.beginLine);}} else if (avariable = null) {{if ("" != null) return new ASTVariableDefStatement(generaltoken.image, bvariable.image, generaltoken.beginLine);}}
       break;
       }
     case SEMICOLON:{
