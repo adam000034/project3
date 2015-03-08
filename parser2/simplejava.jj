@@ -144,11 +144,14 @@ ASTFormal formalparameter() :
 	}}
 }
 
-boolean variabledeclarations() :
-{Token onetok = null; Token twotok = null;}
+int variabledeclarations() :
+/* {Token onetok = null; Token twotok = null;} */
+{int counter = 0;}
 {	
-	((onetok = <LEFT_BRACKET>) (twotok = <RIGHT_BRACKET>))*
-	{if (onetok != null && twotok != null) {return true;} else {return false;}}
+	/*((onetok = <LEFT_BRACKET>) (twotok = <RIGHT_BRACKET>))* */
+	(((<LEFT_BRACKET>) (<RIGHT_BRACKET>)) {counter++;})* 
+	/* {if (onetok != null && twotok != null) {return true;} else {return false;}} */
+	{return counter;}
 }
 
 void variabledefinitions() :
@@ -180,7 +183,8 @@ ASTVariable variable(ASTVariable passedinvar) :
 void followsclassdefinitionstypes() :
 {}
 {
-	<LEFT_BRACKET> ((followsbrackets())+) 
+/* HAVE  TO CONSIDER THI CASE EVENTUALLY */
+	<LEFT_BRACKET> ((followsbracketsone())+) 
 
 }
 
@@ -193,7 +197,7 @@ void classdefinitions() :
 
 ASTStatement statement() :
 /* POSSIBLE PROBLEMS WITH INTIALIZING ARRAYVARIABLETOKEN TO BE NULL */
-{ASTAssignmentStatement assignstate; ASTVariable avariable = null; Token arrayvariabletoken = null; ASTExpression expression = null; boolean bracketchecker= false; Token generaltoken; ASTVariable passedinvariable; ASTStatements returner = new ASTStatements();
+{ASTAssignmentStatement assignstate; ASTVariable avariable = null; Token arrayvariabletoken = null; ASTExpression expression = null; int bracketcounter= 0; Token generaltoken; ASTVariable passedinvariable; ASTStatements returner = new ASTStatements();
 ASTVariable bvariable = null;}
 {
 	dowhilestatement()
@@ -202,11 +206,18 @@ ASTVariable bvariable = null;}
 |	<IF> ifstatement()
 |	forstatement()
 |	<LEFT_BRACE> ((statement())*) <RIGHT_BRACE>
-|	generaltoken = <IDENTIFIER> {passedinvariable = new ASTBaseVariable(generaltoken.image, generaltoken.beginLine);} ((arrayvariabletoken= <IDENTIFIER>  bracketchecker = variabledeclarations() {avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beginLine);})| (bvariable = variable(
+|	generaltoken = <IDENTIFIER> {passedinvariable = new ASTBaseVariable(generaltoken.image, generaltoken.beginLine);} ((arrayvariabletoken= <IDENTIFIER>  bracketcounter = variabledeclarations() {avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beginLine);})| (bvariable = variable(
 /* MAKE SURE TO MAKE CHANGES, was semicolon before but now is emptystatement because they mean the same thing */
-passedinvariable))) ((expression = followsvariablenames())?) emptystatement() {if (bracketchecker == false && bvariable == null && expression == null) {
+passedinvariable))) ((expression = followsvariablenames())?) emptystatement() {if (bracketcounter == 0 && bvariable == null && expression == null) {
 	return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, generaltoken.beginLine);
-}if (expression == null) {return null;} else {return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);} }
+} if (bracketcounter == 0 && bvariable == null && expression != null) {
+	return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, expression,generaltoken.beginLine);
+}
+if (bracketcounter != 0 && bvariable == null && expression == null) {
+
+	return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, bracketcounter,generaltoken.beginLine);
+}
+if (expression == null) {return null;} else {return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);} }
 |	emptystatement()
 }
 
@@ -322,14 +333,14 @@ ASTExpression expfive() :
 }
 
 ASTExpression F() :
-{Token t; ASTExpression value;}
+{Token t; ASTExpression value = null;}
 {
 	<MINUS>value = F() {return new ASTOperatorExpression(new ASTIntegerLiteral(0, 0), value, ASTOperatorExpression.MINUS, 0);}
 |	t = <INTEGER_LITERAL> { return new ASTIntegerLiteral(Integer.parseInt(t.image), t.beginLine);}
 |	t = <TRUE> { return new ASTBooleanLiteral(Boolean.parseBoolean(t.image), t.beginLine);}
 |	t = <FALSE> {return new ASTBooleanLiteral(Boolean.parseBoolean(t.image), t.beginLine);}
 |	<IDENTIFIER> ((followsvariablenamesforexpressions())?)
-|	<NEW> <IDENTIFIER> followsnewandidentifier()
+|	<NEW> t = <IDENTIFIER> value = followsnewandidentifier(t) 
 |	<LEFT_PARENTHESIS> value = expression()<RIGHT_PARENTHESIS>{return value;}
 }
 
@@ -340,11 +351,12 @@ ASTExpression assignmentstatement() :
 
 }
 
-void followsnewandidentifier() :
-{}
+ASTExpression followsnewandidentifier(Token t) :
+{int bracketcounter = 0;}
 {
-	<LEFT_BRACKET> (followsbrackets())
-|	<LEFT_PARENTHESIS><RIGHT_PARENTHESIS>
+	<LEFT_BRACKET> (bracketcounter = followsbrackets())
+|	<LEFT_PARENTHESIS><RIGHT_PARENTHESIS> {return new ASTNewClassExpression(t.image, t.beginLine);}
+	{return null;}
 }
 
 void incrementstatements() :
@@ -387,8 +399,14 @@ void followsvariablenamesforexpressions() :
 |	incrementstatements()
 }
 
-void followsbrackets() :
+void followsbracketsone() :
 {}
 {
-	expression() <RIGHT_BRACKET>((<LEFT_BRACKET><RIGHT_BRACKET>)*)
+	expression() <RIGHT_BRACKET> (((<LEFT_BRACKET><RIGHT_BRACKET>)))
+}
+
+ASTExpression followsbrackets() :
+{int counter = 0; ASTExpression value = null;}
+{
+	value = expression() <RIGHT_BRACKET> {counter++;}(((<LEFT_BRACKET><RIGHT_BRACKET>){counter++;})*) {return new ASTNewArrayExpression(t.image, value, counter, t.beginLine);}
 }

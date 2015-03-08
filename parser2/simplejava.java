@@ -172,7 +172,7 @@ if (returnformal != null) {
     throw new Error("Missing return statement in function");
   }
 
-  static final public boolean variabledeclarations() throws ParseException {Token onetok = null; Token twotok = null;
+  static final public int variabledeclarations() throws ParseException {int counter = 0;
     label_6:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -184,10 +184,11 @@ if (returnformal != null) {
         jj_la1[8] = jj_gen;
         break label_6;
       }
-      onetok = jj_consume_token(LEFT_BRACKET);
-      twotok = jj_consume_token(RIGHT_BRACKET);
+      jj_consume_token(LEFT_BRACKET);
+      jj_consume_token(RIGHT_BRACKET);
+counter++;
     }
-if (onetok != null && twotok != null) {{if ("" != null) return true;}} else {{if ("" != null) return false;}}
+{if ("" != null) return counter;}
     throw new Error("Missing return statement in function");
   }
 
@@ -298,7 +299,7 @@ if (onetok != null && twotok != null) {{if ("" != null) return true;}} else {{if
     jj_consume_token(RIGHT_BRACE);
   }
 
-  static final public ASTStatement statement() throws ParseException {ASTAssignmentStatement assignstate; ASTVariable avariable = null; Token arrayvariabletoken = null; ASTExpression expression = null; boolean bracketchecker= false; Token generaltoken; ASTVariable passedinvariable; ASTStatements returner = new ASTStatements();
+  static final public ASTStatement statement() throws ParseException {ASTAssignmentStatement assignstate; ASTVariable avariable = null; Token arrayvariabletoken = null; ASTExpression expression = null; int bracketcounter= 0; Token generaltoken; ASTVariable passedinvariable; ASTStatements returner = new ASTStatements();
 ASTVariable bvariable = null;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case DO:{
@@ -359,7 +360,7 @@ passedinvariable = new ASTBaseVariable(generaltoken.image, generaltoken.beginLin
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case IDENTIFIER:{
         arrayvariabletoken = jj_consume_token(IDENTIFIER);
-        bracketchecker = variabledeclarations();
+        bracketcounter = variabledeclarations();
 avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beginLine);
         break;
         }
@@ -381,9 +382,16 @@ avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beg
         ;
       }
       emptystatement();
-if (bracketchecker == false && bvariable == null && expression == null) {
+if (bracketcounter == 0 && bvariable == null && expression == null) {
         {if ("" != null) return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, generaltoken.beginLine);}
-}if (expression == null) {{if ("" != null) return null;}} else {{if ("" != null) return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);}}
+} if (bracketcounter == 0 && bvariable == null && expression != null) {
+        {if ("" != null) return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, expression,generaltoken.beginLine);}
+}
+if (bracketcounter != 0 && bvariable == null && expression == null) {
+
+        {if ("" != null) return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, bracketcounter,generaltoken.beginLine);}
+}
+if (expression == null) {{if ("" != null) return null;}} else {{if ("" != null) return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);}}
       break;
       }
     case SEMICOLON:{
@@ -709,7 +717,7 @@ result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
     throw new Error("Missing return statement in function");
   }
 
-  static final public ASTExpression F() throws ParseException {Token t; ASTExpression value;
+  static final public ASTExpression F() throws ParseException {Token t; ASTExpression value = null;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case MINUS:{
       jj_consume_token(MINUS);
@@ -752,8 +760,8 @@ result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
       }
     case NEW:{
       jj_consume_token(NEW);
-      jj_consume_token(IDENTIFIER);
-      followsnewandidentifier();
+      t = jj_consume_token(IDENTIFIER);
+      value = followsnewandidentifier(t);
       break;
       }
     case LEFT_PARENTHESIS:{
@@ -778,16 +786,18 @@ result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
     throw new Error("Missing return statement in function");
   }
 
-  static final public void followsnewandidentifier() throws ParseException {
+  static final public ASTExpression followsnewandidentifier(Token t) throws ParseException {int bracketcounter = 0;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case LEFT_BRACKET:{
       jj_consume_token(LEFT_BRACKET);
-      followsbrackets();
+      bracketcounter = followsbrackets();
       break;
       }
     case LEFT_PARENTHESIS:{
       jj_consume_token(LEFT_PARENTHESIS);
       jj_consume_token(RIGHT_PARENTHESIS);
+{if ("" != null) return new ASTNewClassExpression(t.image, t.beginLine);}
+{if ("" != null) return null;}
       break;
       }
     default:
@@ -795,6 +805,7 @@ result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
       jj_consume_token(-1);
       throw new ParseException();
     }
+    throw new Error("Missing return statement in function");
   }
 
   static final public void incrementstatements() throws ParseException {
@@ -1068,9 +1079,10 @@ astvar = null;
     }
   }
 
-  static final public void followsbrackets() throws ParseException {
-    expression();
+  static final public ASTExpression followsbrackets() throws ParseException {int counter = 0; ASTExpression value = null;
+    value = expression();
     jj_consume_token(RIGHT_BRACKET);
+counter++;
     label_24:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -1084,7 +1096,10 @@ astvar = null;
       }
       jj_consume_token(LEFT_BRACKET);
       jj_consume_token(RIGHT_BRACKET);
+counter++;
     }
+{if ("" != null) return new ASTNewArrayExpression(t.image, value, counter, t.beginLine);}
+    throw new Error("Missing return statement in function");
   }
 
   static private boolean jj_initialized_once = false;
