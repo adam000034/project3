@@ -13,7 +13,7 @@ public class TestParser {
 	    return;
 	} 
 	try {
-	    ASTExpression prog = parser.expression();
+	    ASTFunctionDefinition prog = parser.functionprototypeordefinition();
 	    ASTPrintTree pt = new ASTPrintTree();
 	    System.out.println("Parsing Successful");
 	    prog.Accept(pt);

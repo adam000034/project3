@@ -210,38 +210,45 @@ ASTClass classdefinitions() :
 ASTStatement statement() :
 /* POSSIBLE PROBLEMS WITH INTIALIZING ARRAYVARIABLETOKEN TO BE NULL */
 {ASTAssignmentStatement assignstate; ASTVariable avariable = null; Token arrayvariabletoken = null; ASTExpression expression = null; int bracketcounter= 0; Token generaltoken; ASTVariable passedinvariable; ASTStatements returner = new ASTStatements();
-ASTVariable bvariable = null; ASTBaseVariable basevariable = null;}
+ASTVariable bvariable = null; ASTBaseVariable basevariable = null; ASTIfStatement ifstatement;}
 {
 	dowhilestatement()
 |	<RETURN> expression() <SEMICOLON>
 |	<WHILE> <LEFT_PARENTHESIS> test() <RIGHT_PARENTHESIS> statement()
-|	<IF> ifstatement()
+|	generaltoken = <IF> ifstatement = ifstatement() {return ifstatement;}
 |	forstatement()
 |	<LEFT_BRACE> ((statement())*) <RIGHT_BRACE>
 |	generaltoken = <IDENTIFIER> {passedinvariable = new ASTBaseVariable(generaltoken.image, generaltoken.beginLine);} ((arrayvariabletoken= <IDENTIFIER>  bracketcounter = variabledeclarations() {avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beginLine);})| (bvariable = variable(
 /* MAKE SURE TO MAKE CHANGES, was semicolon before but now is emptystatement because they mean the same thing */
-passedinvariable))) ((expression = followsvariablenames())?) emptystatement() {if (bracketcounter == 0 && bvariable == null && expression == null) {
+passedinvariable))) ((expression = followsvariablenames())?) emptystatement() {
+/*This handles the case: int a; */
+if (bracketcounter == 0 && bvariable == null && expression == null) {
 	return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, generaltoken.beginLine);
-} 
+}
+/* This handles the case: a = 4 + 3; */
 if (bracketcounter == 0 && bvariable == null && expression != null && avariable == null) {
 	basevariable = new ASTBaseVariable(generaltoken.image, generaltoken.beginLine);
 	return new ASTAssignmentStatement(basevariable, expression, generaltoken.beginLine);
 }
+/* This handles the case: a[3]=4+3; */
 if (bracketcounter != 0 && bvariable != null && expression != null && avariable == null) {
 	basevariable = new ASTBaseVariable(generaltoken.image, generaltoken.beginLine);
 	return new ASTAssignmentStatement(basevariable, expression, generaltoken.beginLine);
 }
+/* This handles the case: int x = 5 + 3;
 if (bracketcounter == 0 && bvariable == null && expression != null) {
 	return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, expression,generaltoken.beginLine);
 }
+/* This handles the case: int z;
 if (bracketcounter != 0 && bvariable == null && expression == null) {
 
 	return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, bracketcounter,generaltoken.beginLine);
 }
+/* This handles the case: int z[3][] = 4 + 2;
 if (bracketcounter != 0 && bvariable == null && expression != null) {
 	return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, bracketcounter, expression, generaltoken.beginLine);
 }
-
+/* This handles the case: 
 if (expression == null) {return null;} else {return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);} }
 |	emptystatement()
 }
@@ -254,10 +261,24 @@ void test() :
 expression()
 }
 
-void ifstatement() :
-{}
+
+
+ASTIfStatement ifstatement() :
+{ASTIfStatement ifstatementtest; ASTExpression test; ASTStatement thenstatement; ASTStatement elsestatement = null; int line; Token andcapture=null; Token orcapture=null; ASTExpression rightsideequal = null; Token linenumbercatcher;}
 {
-	<LEFT_PARENTHESIS> expression() (((<AND> expression())?) | ((<OR> expression())?)) <RIGHT_PARENTHESIS> statement() ((LOOKAHEAD(1) <ELSE> statement())?) 
+	linenumbercatcher = <LEFT_PARENTHESIS> test = expression() (((andcapture = <AND> rightsideequal = expression())?) | ((orcapture = <OR> rightsideequal = expression())?))
+		{
+			if (andcapture != null || orcapture != null && rightsideequal != null) {
+				if (orcapture == null) {
+					test = new ASTOperatorExpression(test, rightsideequal,  andcapture.image, andcapture.beginLine);
+				} else if (andcapture == null) {
+					test = new ASTOperatorExpression(test, rightsideequal, orcapture.image, orcapture.beginLine);
+				}
+			}
+
+		} <RIGHT_PARENTHESIS> thenstatement = statement() ((LOOKAHEAD(1) <ELSE> elsestatement = statement())?)
+		/* HANDLE THE CASE WHERE THERE IS NO ELSESTATEMENT */ 
+		{return new ASTIfStatement(test, thenstatement, elsestatement, linenumbercatcher.beginLine);}
 }
 
 ASTEmptyStatement emptystatement() :
@@ -395,9 +416,10 @@ ASTExpression followsnewandidentifier(Token t) :
 	{return null;}
 }
 
-void incrementstatements() :
-{}
+ASTAssignmentStatement incrementstatements() :
+{ASTAssignmentStatement assignstatement;}
 {
+	ASTAssignmentStatement(ASTVariable variable, ASTExpression value, int line) {
 	incrementstatement()
 |	decrementstatement()
 }
@@ -411,13 +433,11 @@ ASTVariable followsvariables(ASTVariable astvar) :
 }
 
 ASTExpression followsvariablenames() :
-{ASTExpression value;}
+{ASTExpression value; ASTVariable variable;}
 {
 	<LEFT_PARENTHESIS> ((expressionlist())?) <RIGHT_PARENTHESIS> ((followsvariablenames())?)
 |	value = assignmentstatement() {return value;} 
-/* Need a way to make sure that amount of brackets are matched on left side with number on right side */
-/*|	variabledeclarationstatemementsbrackets() ((followsvariablenames())?)*/
-|	incrementstatements()
+|	vriable = incrementstatements()	
 }
 
 ASTVariable followsvariablenamesforexpressions(ASTVariable variable) :

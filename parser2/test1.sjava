@@ -1,10 +1,46 @@
-1+2*3+4;
+void main() {
+
+   if (x>3)
+       x++;
+    else
+       x--;
+   
+}
+if (z < 2)
+      x = x + 2;
+   for (i=0; i<10; i++)
+      w = z;
+   while (x > 3) {
+      while (z > 2)
+         while (x > 4)
+            for(x=0; x<10; x++);
+   }
+   do 
+     x++;
+   while (x < 10);
+   if (x < 3)
+     if (y > 2)
+       if (z >= 2)
+          x++;
+       else 
+          y--;
+     else
+       z++;
+   else
+     w++;
+   {
+      y = y + 1;
+      z = w - 2;
+   }
+   foo(x + y, z, 4);
+x[3][4].foo[8].bar[x.y][3].z.w.x[x.y.z] = y;
+1+2*3+4;			//WORKING
 void main() { C x = new C(); }
 class C { bar y[][][][][][][][][][]; int x; boolean z; boolean w[][][]; } //WORKING
 class bar { foo x[][][]; boolean z; }  //WORKING
 class foo { int x; int z[];}	//WORKING
 
-x[3][4].foo[8].bar[x.y][3].z.w.x[x.y.z] = y;
+
 void main() { int x; int y = 3; int z[][][][][]; int x[][] = new int[3][]; x = 3; x[3][4].foo[8].bar[x.y][3].z.w.x[x.y.z] = y; }	//WORKING
 void main() { }		//WORKING
 int x;				//WORKING 

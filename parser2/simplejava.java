@@ -313,7 +313,7 @@ astclass = new ASTClass(stringt.image, variabledefs, stringt.beginLine);
   }
 
   static final public ASTStatement statement() throws ParseException {ASTAssignmentStatement assignstate; ASTVariable avariable = null; Token arrayvariabletoken = null; ASTExpression expression = null; int bracketcounter= 0; Token generaltoken; ASTVariable passedinvariable; ASTStatements returner = new ASTStatements();
-ASTVariable bvariable = null; ASTBaseVariable basevariable = null;
+ASTVariable bvariable = null; ASTBaseVariable basevariable = null; ASTIfStatement ifstatement;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case DO:{
       dowhilestatement();
@@ -334,8 +334,9 @@ ASTVariable bvariable = null; ASTBaseVariable basevariable = null;
       break;
       }
     case IF:{
-      jj_consume_token(IF);
-      ifstatement();
+      generaltoken = jj_consume_token(IF);
+      ifstatement = ifstatement();
+{if ("" != null) return ifstatement;}
       break;
       }
     case FOR:{
@@ -436,31 +437,40 @@ if (expression == null) {{if ("" != null) return null;}} else {{if ("" != null) 
     expression();
   }
 
-  static final public void ifstatement() throws ParseException {
-    jj_consume_token(LEFT_PARENTHESIS);
-    expression();
+  static final public ASTIfStatement ifstatement() throws ParseException {ASTIfStatement ifstatementtest; ASTExpression test; ASTStatement thenstatement; ASTStatement elsestatement = null; int line; Token andcapture=null; Token orcapture=null; ASTExpression rightsideequal = null; Token linenumbercatcher;
+    linenumbercatcher = jj_consume_token(LEFT_PARENTHESIS);
+    test = expression();
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case AND:{
-      jj_consume_token(AND);
-      expression();
+      andcapture = jj_consume_token(AND);
+      rightsideequal = expression();
       break;
       }
     default:
       jj_la1[18] = jj_gen;
       ;
     }
+if (andcapture != null || orcapture != null && rightsideequal != null) {
+                                if (orcapture == null) {
+                                        test = new ASTOperatorExpression(test, rightsideequal,  andcapture.image, andcapture.beginLine);
+                                } else if (andcapture == null) {
+                                        test = new ASTOperatorExpression(test, rightsideequal, orcapture.image, orcapture.beginLine);
+                                }
+                        }
     jj_consume_token(RIGHT_PARENTHESIS);
-    statement();
+    thenstatement = statement();
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case ELSE:{
       jj_consume_token(ELSE);
-      statement();
+      elsestatement = statement();
       break;
       }
     default:
       jj_la1[20] = jj_gen;
       ;
     }
+{if ("" != null) return new ASTIfStatement(test, thenstatement, elsestatement, linenumbercatcher.beginLine);}
+    throw new Error("Missing return statement in function");
   }
 
   static final public ASTEmptyStatement emptystatement() throws ParseException {Token semicolontoken; ASTEmptyStatement returnstate;
