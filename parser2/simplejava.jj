@@ -222,7 +222,7 @@ ASTVariable bvariable = null; ASTBaseVariable basevariable = null; ASTIfStatemen
 	/* Note: bvariable correlates to followsvariables */
 |	generaltoken = <IDENTIFIER> {passedinvariable = new ASTBaseVariable(generaltoken.image, generaltoken.beginLine);} ((arrayvariabletoken= <IDENTIFIER>  bracketcounter = variabledeclarations() {avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beginLine);})| (bvariable = variable(
 	/* MAKE SURE TO MAKE CHANGES, was semicolon before but now is emptystatement because they mean the same thing */
-	passedinvariable))) ((expression = followsvariablenames())?) emptystatement() {
+	passedinvariable))) {if((expression = followsvariablenames())?) emptystatement() {
 		/*This handles the case: int a; */
 		if (bracketcounter == 0 && bvariable == null && expression == null) {
 			return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, generaltoken.beginLine);
@@ -309,11 +309,11 @@ void initialization() :
 }
 
 void forstatement() :
-{}
+{Token identifier;}
 {
 	/*Second initialization() is actually increment from book */
 	<FOR> <LEFT_PARENTHESIS> 
-		((<IDENTIFIER> (followsvariablenames())*)?) <SEMICOLON> 
+		((identifier = <IDENTIFIER> (followsvariablenames())*)?) <SEMICOLON> 
 		test() <SEMICOLON> 
 		((<IDENTIFIER> initialization())?) 
 		<RIGHT_PARENTHESIS> statement()
@@ -422,11 +422,11 @@ ASTExpression followsnewandidentifier(Token t) :
 }
 
 ASTAssignmentStatement incrementstatements() :
-{ASTAssignmentStatement assignstatement;}
+{ASTAssignmentStatement assignstatement; ASTVariable variable;}
 {
 	ASTAssignmentStatement(ASTVariable variable, ASTExpression value, int line) {
-	incrementstatement()
-|	decrementstatement()
+	variable = incrementstatement()
+|	variable = decrementstatement()
 }
 
 ASTVariable followsvariables(ASTVariable astvar) :

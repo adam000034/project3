@@ -1,3 +1,4 @@
+x[3][4].foo[8].bar[x.y][3].z.w.x[x.y.z] = y;
 void main() {
 
    if (x>3)
@@ -33,7 +34,7 @@ if (z < 2)
       z = w - 2;
    }
    foo(x + y, z, 4);
-x[3][4].foo[8].bar[x.y][3].z.w.x[x.y.z] = y;
+
 1+2*3+4;			//WORKING
 void main() { C x = new C(); }
 class C { bar y[][][][][][][][][][]; int x; boolean z; boolean w[][][]; } //WORKING
