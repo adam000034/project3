@@ -222,7 +222,10 @@ ASTVariable bvariable = null; ASTBaseVariable basevariable = null; ASTIfStatemen
 	/* Note: bvariable correlates to followsvariables */
 |	generaltoken = <IDENTIFIER> {passedinvariable = new ASTBaseVariable(generaltoken.image, generaltoken.beginLine);} ((arrayvariabletoken= <IDENTIFIER>  bracketcounter = variabledeclarations() {avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beginLine);})| (bvariable = variable(
 	/* MAKE SURE TO MAKE CHANGES, was semicolon before but now is emptystatement because they mean the same thing */
-	passedinvariable))) {if((expression = followsvariablenames())?) emptystatement() {
+	passedinvariable))) 
+	/*{if((expression = followsvariablenames())?) */
+	((followsvariablenames())?)
+	emptystatement() {
 		/*This handles the case: int a; */
 		if (bracketcounter == 0 && bvariable == null && expression == null) {
 			return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, generaltoken.beginLine);
@@ -424,7 +427,7 @@ ASTExpression followsnewandidentifier(Token t) :
 ASTAssignmentStatement incrementstatements() :
 {ASTAssignmentStatement assignstatement; ASTVariable variable;}
 {
-	ASTAssignmentStatement(ASTVariable variable, ASTExpression value, int line) {
+	/*ASTAssignmentStatement(variable, ASTExpression value, int line) { */
 	variable = incrementstatement()
 |	variable = decrementstatement()
 }

@@ -381,14 +381,14 @@ avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beg
       default:
         jj_la1[15] = jj_gen;
         bvariable = variable(/* MAKE SURE TO MAKE CHANGES, was semicolon before but now is emptystatement because they mean the same thing */
-        passedinvariable);
+                passedinvariable);
       }
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case LEFT_PARENTHESIS:
       case GETS:
       case ADD:
       case MINUSMINUS:{
-        expression = followsvariablenames();
+        followsvariablenames();
         break;
         }
       default:
@@ -396,29 +396,35 @@ avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beg
         ;
       }
       emptystatement();
-if (bracketcounter == 0 && bvariable == null && expression == null) {
-        {if ("" != null) return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, generaltoken.beginLine);}
-}
-if (bracketcounter == 0 && bvariable == null && expression != null && avariable == null) {
-        basevariable = new ASTBaseVariable(generaltoken.image, generaltoken.beginLine);
-        {if ("" != null) return new ASTAssignmentStatement(basevariable, expression, generaltoken.beginLine);}
-}
-if (bracketcounter != 0 && bvariable != null && expression != null && avariable == null) {
-        basevariable = new ASTBaseVariable(generaltoken.image, generaltoken.beginLine);
-        {if ("" != null) return new ASTAssignmentStatement(basevariable, expression, generaltoken.beginLine);}
-}
-if (bracketcounter == 0 && bvariable == null && expression != null) {
-        {if ("" != null) return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, expression,generaltoken.beginLine);}
-}
-if (bracketcounter != 0 && bvariable == null && expression == null) {
-
-        {if ("" != null) return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, bracketcounter,generaltoken.beginLine);}
-}
-if (bracketcounter != 0 && bvariable == null && expression != null) {
-        {if ("" != null) return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, bracketcounter, expression, generaltoken.beginLine);}
-}
-
-if (expression == null) {{if ("" != null) return null;}} else {{if ("" != null) return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);}}
+/*This handles the case: int a; */
+                if (bracketcounter == 0 && bvariable == null && expression == null) {
+                        {if ("" != null) return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, generaltoken.beginLine);}
+                }
+                /* This handles the case: a = 4 + 3; */
+                if (bracketcounter == 0 && bvariable == null && expression != null && avariable == null) {
+                        basevariable = new ASTBaseVariable(generaltoken.image, generaltoken.beginLine);
+                        {if ("" != null) return new ASTAssignmentStatement(basevariable, expression, generaltoken.beginLine);}
+                }
+                /* This handles the case: a[3]=4+3; */
+                if (bracketcounter != 0 && bvariable != null && expression != null && avariable == null) {
+                        basevariable = new ASTBaseVariable(generaltoken.image, generaltoken.beginLine);
+                        {if ("" != null) return new ASTAssignmentStatement(basevariable, expression, generaltoken.beginLine);}
+                }
+                /* This handles the case: int x = 5 + 3;*/
+                if (bracketcounter == 0 && bvariable == null && expression != null) {
+                        {if ("" != null) return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, expression,generaltoken.beginLine);}
+                }
+                /* This handles the case: int z[]; */
+                if (bracketcounter != 0 && bvariable == null && expression == null) {
+                        {if ("" != null) return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, bracketcounter,generaltoken.beginLine);}
+                }
+                /* This handles the case: int z[3][] = 4 + 2; */
+                if (bracketcounter != 0 && bvariable == null && expression != null) {
+                        {if ("" != null) return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, bracketcounter, expression, generaltoken.beginLine);}
+                }
+                /* This handles the case: */
+                if (expression == null) {{if ("" != null) return null;}}
+                else {{if ("" != null) return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);}}
       break;
       }
     case SEMICOLON:{
@@ -520,12 +526,12 @@ returnstate = new ASTEmptyStatement(semicolontoken.beginLine);
     }
   }
 
-  static final public void forstatement() throws ParseException {
+  static final public void forstatement() throws ParseException {Token identifier;
     jj_consume_token(FOR);
     jj_consume_token(LEFT_PARENTHESIS);
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case IDENTIFIER:{
-      jj_consume_token(IDENTIFIER);
+      identifier = jj_consume_token(IDENTIFIER);
       label_12:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -849,14 +855,15 @@ variableexpression = new ASTVariableExpression(variable, variable.line());
     throw new Error("Missing return statement in function");
   }
 
-  static final public void incrementstatements() throws ParseException {
+  static final public ASTAssignmentStatement incrementstatements() throws ParseException {ASTAssignmentStatement assignstatement; ASTVariable variable;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case ADD:{
-      incrementstatement();
+      /*ASTAssignmentStatement(variable, ASTExpression value, int line) { */
+              variable = incrementstatement();
       break;
       }
     case MINUSMINUS:{
-      decrementstatement();
+      variable = decrementstatement();
       break;
       }
     default:
@@ -935,7 +942,7 @@ astvar = null;
     throw new Error("Missing return statement in function");
   }
 
-  static final public ASTExpression followsvariablenames() throws ParseException {ASTExpression value;
+  static final public ASTExpression followsvariablenames() throws ParseException {ASTExpression value; ASTVariable variable;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case LEFT_PARENTHESIS:{
       jj_consume_token(LEFT_PARENTHESIS);
@@ -977,7 +984,7 @@ astvar = null;
       }
     case ADD:
     case MINUSMINUS:{
-      incrementstatements();
+      vriable = incrementstatements();
       break;
       }
     default:
