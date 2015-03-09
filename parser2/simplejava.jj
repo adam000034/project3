@@ -218,38 +218,43 @@ ASTVariable bvariable = null; ASTBaseVariable basevariable = null; ASTIfStatemen
 |	generaltoken = <IF> ifstatement = ifstatement() {return ifstatement;}
 |	forstatement()
 |	<LEFT_BRACE> ((statement())*) <RIGHT_BRACE>
-|	generaltoken = <IDENTIFIER> {passedinvariable = new ASTBaseVariable(generaltoken.image, generaltoken.beginLine);} ((arrayvariabletoken= <IDENTIFIER>  bracketcounter = variabledeclarations() {avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beginLine);})| (bvariable = variable(
-/* MAKE SURE TO MAKE CHANGES, was semicolon before but now is emptystatement because they mean the same thing */
-passedinvariable))) ((expression = followsvariablenames())?) emptystatement() {
-/*This handles the case: int a; */
-if (bracketcounter == 0 && bvariable == null && expression == null) {
-	return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, generaltoken.beginLine);
-}
-/* This handles the case: a = 4 + 3; */
-if (bracketcounter == 0 && bvariable == null && expression != null && avariable == null) {
-	basevariable = new ASTBaseVariable(generaltoken.image, generaltoken.beginLine);
-	return new ASTAssignmentStatement(basevariable, expression, generaltoken.beginLine);
-}
-/* This handles the case: a[3]=4+3; */
-if (bracketcounter != 0 && bvariable != null && expression != null && avariable == null) {
-	basevariable = new ASTBaseVariable(generaltoken.image, generaltoken.beginLine);
-	return new ASTAssignmentStatement(basevariable, expression, generaltoken.beginLine);
-}
-/* This handles the case: int x = 5 + 3;
-if (bracketcounter == 0 && bvariable == null && expression != null) {
-	return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, expression,generaltoken.beginLine);
-}
-/* This handles the case: int z;
-if (bracketcounter != 0 && bvariable == null && expression == null) {
 
-	return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, bracketcounter,generaltoken.beginLine);
-}
-/* This handles the case: int z[3][] = 4 + 2;
-if (bracketcounter != 0 && bvariable == null && expression != null) {
-	return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, bracketcounter, expression, generaltoken.beginLine);
-}
-/* This handles the case: 
-if (expression == null) {return null;} else {return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);} }
+	/* Note: bvariable correlates to followsvariables */
+|	generaltoken = <IDENTIFIER> {passedinvariable = new ASTBaseVariable(generaltoken.image, generaltoken.beginLine);} ((arrayvariabletoken= <IDENTIFIER>  bracketcounter = variabledeclarations() {avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beginLine);})| (bvariable = variable(
+	/* MAKE SURE TO MAKE CHANGES, was semicolon before but now is emptystatement because they mean the same thing */
+	passedinvariable))) ((expression = followsvariablenames())?) emptystatement() {
+		/*This handles the case: int a; */
+		if (bracketcounter == 0 && bvariable == null && expression == null) {
+			return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, generaltoken.beginLine);
+		}
+		/* This handles the case: a = 4 + 3; */
+		if (bracketcounter == 0 && bvariable == null && expression != null && avariable == null) {
+			basevariable = new ASTBaseVariable(generaltoken.image, generaltoken.beginLine);
+			return new ASTAssignmentStatement(basevariable, expression, generaltoken.beginLine);
+		}
+		/* This handles the case: a[3]=4+3; */
+		if (bracketcounter != 0 && bvariable != null && expression != null && avariable == null) {
+			basevariable = new ASTBaseVariable(generaltoken.image, generaltoken.beginLine);
+			return new ASTAssignmentStatement(basevariable, expression, generaltoken.beginLine);
+		}
+		/* This handles the case: int x = 5 + 3;*/
+		if (bracketcounter == 0 && bvariable == null && expression != null) {
+			return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, expression,generaltoken.beginLine);
+		}
+		/* This handles the case: int z[]; */
+		if (bracketcounter != 0 && bvariable == null && expression == null) {		
+			return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, bracketcounter,generaltoken.beginLine);
+		}
+		/* This handles the case: int z[3][] = 4 + 2; */
+		if (bracketcounter != 0 && bvariable == null && expression != null) {
+			return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, bracketcounter, expression, generaltoken.beginLine);
+		}
+		/* This handles the case: */
+		if (expression == null) {return null;} 
+		else {return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);} 
+		
+	}
+	
 |	emptystatement()
 }
 
