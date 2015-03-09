@@ -315,7 +315,7 @@ ASTExpression expone() :
 }
 
 ASTExpression exptwo() :
-{Token t; ASTExpression result; ASTExpression rhs;}
+{Token t = null; ASTExpression result; ASTExpression rhs;}
 {
 	/*result = expthree()((((t=<NOT>) rhs = expthree())
 	{
@@ -323,7 +323,16 @@ ASTExpression exptwo() :
 	})*)
 	{ return result;}*/
 	
-	((<NOT>)?) expthree()
+	((t=<NOT>)?) rhs = expthree()
+	{if (t != null) {
+		result = new ASTUnaryOperatorExpression(rhs, t.image, t.beginLine);
+		return result;
+	} else {
+		result = rhs;
+		return result;
+	}
+	}
+	
 }
 
 ASTExpression expthree() :
@@ -418,7 +427,7 @@ ASTVariable followsvariablenamesforexpressions(ASTVariable variable) :
 	variabletoken = <IDENTIFIER> {basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);}((followsvariablenamesforexpressions(basevar))*) 
 |	((<PERIOD> variabletoken = <IDENTIFIER> {basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);})+)((followsvariablenamesforexpressions(basevar))?) {return new ASTClassVariable(variable, variabletoken.image, variabletoken.beginLine);}
 //|	<LEFT_PARENTHESIS> ((expressionlist())?) <RIGHT_PARENTHESIS> ((followsvariablenamesforexpressions(basevar))?)
-|	<LEFT_PARENTHESIS> ((expressionlist())?) <RIGHT_PARENTHESIS> ((((<PERIOD> <IDENTIFIER>)+) ((followsvariablenamesforexpressions())?))?)
+|	<LEFT_PARENTHESIS> ((expressionlist())?) <RIGHT_PARENTHESIS> ((((<PERIOD> variabletoken = <IDENTIFIER> {basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);})+) ((followsvariablenamesforexpressions(basevar))?))?)
 |	((<LEFT_BRACKET> expression() <RIGHT_BRACKET>)+) ((followsvariablenamesforexpressions(basevar))?) 
 |	incrementstatements()
 }
