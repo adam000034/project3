@@ -388,7 +388,7 @@ avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beg
       case GETS:
       case ADD:
       case MINUSMINUS:{
-        followsvariablenames();
+        expression = followsvariablenames();
         break;
         }
       default:
@@ -855,15 +855,14 @@ variableexpression = new ASTVariableExpression(variable, variable.line());
     throw new Error("Missing return statement in function");
   }
 
-  static final public ASTAssignmentStatement incrementstatements() throws ParseException {ASTAssignmentStatement assignstatement; ASTVariable variable;
+  static final public void incrementstatements() throws ParseException {ASTAssignmentStatement assignstatement; ASTVariable variable;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case ADD:{
-      /*ASTAssignmentStatement(variable, ASTExpression value, int line) { */
-              variable = incrementstatement();
+      incrementstatement();
       break;
       }
     case MINUSMINUS:{
-      variable = decrementstatement();
+      decrementstatement();
       break;
       }
     default:
@@ -984,7 +983,7 @@ astvar = null;
       }
     case ADD:
     case MINUSMINUS:{
-      vriable = incrementstatements();
+      incrementstatements();
       break;
       }
     default:

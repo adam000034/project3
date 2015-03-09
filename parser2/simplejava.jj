@@ -224,7 +224,7 @@ ASTVariable bvariable = null; ASTBaseVariable basevariable = null; ASTIfStatemen
 	/* MAKE SURE TO MAKE CHANGES, was semicolon before but now is emptystatement because they mean the same thing */
 	passedinvariable))) 
 	/*{if((expression = followsvariablenames())?) */
-	((followsvariablenames())?)
+	((expression = followsvariablenames())?)
 	emptystatement() {
 		/*This handles the case: int a; */
 		if (bracketcounter == 0 && bvariable == null && expression == null) {
@@ -424,12 +424,12 @@ ASTExpression followsnewandidentifier(Token t) :
 	{return null;}
 }
 
-ASTAssignmentStatement incrementstatements() :
+void incrementstatements() :
 {ASTAssignmentStatement assignstatement; ASTVariable variable;}
 {
 	/*ASTAssignmentStatement(variable, ASTExpression value, int line) { */
-	variable = incrementstatement()
-|	variable = decrementstatement()
+	incrementstatement()
+|	decrementstatement() 
 }
 
 ASTVariable followsvariables(ASTVariable astvar) :
@@ -437,7 +437,8 @@ ASTVariable followsvariables(ASTVariable astvar) :
 {
 	((<PERIOD> variabletoken = <IDENTIFIER> {nextvariable = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);})+) ((followsvariables(nextvariable))?) {return new ASTClassVariable(astvar, variabletoken.image, variabletoken.beginLine);}
 	//TOKEN USED IN SECOND CASE JUST TO CAPTURE LINE NUMBER FOR NOW
-|	((<LEFT_BRACKET> express = expression() variabletoken = <RIGHT_BRACKET>)+) {astvar = null;} ((followsvariables(astvar))?) {return new ASTArrayVariable(astvar, express, variabletoken.beginLine);}
+	/* {astvar = null;} */
+|	((<LEFT_BRACKET> express = expression() variabletoken = <RIGHT_BRACKET>)+) ((followsvariables(astvar))?) {return new ASTArrayVariable(astvar, express, variabletoken.beginLine);}
 }
 
 ASTExpression followsvariablenames() :
@@ -445,7 +446,7 @@ ASTExpression followsvariablenames() :
 {
 	<LEFT_PARENTHESIS> ((expressionlist())?) <RIGHT_PARENTHESIS> ((followsvariablenames())?)
 |	value = assignmentstatement() {return value;} 
-|	vriable = incrementstatements()	
+|	incrementstatements() 
 }
 
 ASTVariable followsvariablenamesforexpressions(ASTVariable variable) :
