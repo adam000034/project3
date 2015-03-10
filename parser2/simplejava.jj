@@ -390,14 +390,14 @@ ASTExpression expfive() :
 }
 
 ASTExpression F() :
-{Token t; ASTExpression value = null; ASTVariable variable = null; ASTVariableExpression variableexpression= null; ASTVariable returnvariable = null;}
+{Token t; ASTExpression value = null; ASTVariable variable = null; ASTVariableExpression variableexpression= null; ASTVariable returnvariable = null; ASTFunctionCallExpression functioncallexpression = null;}
 {
 	<MINUS>value = F() {return new ASTOperatorExpression(new ASTIntegerLiteral(0, 0), value, ASTOperatorExpression.MINUS, 0);}
 |	t = <INTEGER_LITERAL> { return new ASTIntegerLiteral(Integer.parseInt(t.image), t.beginLine);}
 |	t = <TRUE> { return new ASTBooleanLiteral(Boolean.parseBoolean(t.image), t.beginLine);}
 |	t = <FALSE> {return new ASTBooleanLiteral(Boolean.parseBoolean(t.image), t.beginLine);}
-|	t = <IDENTIFIER> {variable = new ASTBaseVariable(t.image, t.beginLine);} 
-((variable = followsvariablenamesforexpressions(variable, t.image))?) {variableexpression = new ASTVariableExpression(variable, variable.line());}	{return variableexpression;}
+|	t = <IDENTIFIER> functioncallexpression = expressionfunctioncalls(t) 
+(({variable = new ASTBaseVariable(t.image, t.beginLine);} variable = followsvariablenamesforexpressions(variable, t.image))?) {variableexpression = new ASTVariableExpression(variable, variable.line());}	{return variableexpression;}
 |	<NEW> t = <IDENTIFIER> value = followsnewandidentifier(t) {return value;}
 |	<LEFT_PARENTHESIS> value = expression()<RIGHT_PARENTHESIS>{return value;}
 }
@@ -484,6 +484,24 @@ ASTExpression followsvariablenames(Token token) :
 |	incrementstatements() 
 }
 
+ASTExpression expressionfunctioncalls(Token token) :
+{ASTExpression expression;}
+{
+	variabletoken = <LEFT_PARENTHESIS> ((result = expressionlist(token.image, token))?)	{System.out.println("I HIT HERE");}<RIGHT_PARENTHESIS> 
+	(((<PERIOD> variabletoken = <IDENTIFIER> {classvar = new ASTClassVariable(variable, variabletoken.image, variabletoken.beginLine);}
+	) 
+	((returnvariable = followsvariablenamesforexpressions(classvar, nameoffunction))?)
+		{if (returnvariable == null) {
+			return classvar;
+		}
+		else {
+			return returnvariable;
+			}
+		}
+
+	)?)	{return variable;}
+}
+
 ASTVariable followsvariablenamesforexpressions(ASTVariable variable, String nameoffunction) :
 {ASTExpression result = null; ASTArrayVariable arrayvar = null; ASTClassVariable classvar = null; Token variabletoken; ASTBaseVariable basevar = null; ASTVariable returnvariable = null;
 ASTFunctionCallExpression funccall = null;}
@@ -515,20 +533,6 @@ ASTFunctionCallExpression funccall = null;}
 )?) {System.out.println("AAAAAA");} {return classvar;}
 ///////////////////////
 
-
-|	variabletoken = <LEFT_PARENTHESIS> ((result = expressionlist(nameoffunction, variabletoken))?)	{System.out.println("I HIT HERE");}<RIGHT_PARENTHESIS> 
-(((<PERIOD> variabletoken = <IDENTIFIER> {classvar = new ASTClassVariable(variable, variabletoken.image, variabletoken.beginLine);}
-) 
-((returnvariable = followsvariablenamesforexpressions(classvar, nameoffunction))?)
-	{if (returnvariable == null) {
-		return classvar;
-	}
-	else {
-		return returnvariable;
-		}
-	}
-
-)?)	{return variable;}
 
 //////////////////////////////////////
 |	((<LEFT_BRACKET> result = expression() variabletoken = <RIGHT_BRACKET>
