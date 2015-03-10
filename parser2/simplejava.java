@@ -441,9 +441,9 @@ avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beg
                         {if ("" != null) return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, bracketcounter, expression, generaltoken.beginLine);}
                 }
                 /* This handles the case: */
-                if (arrayvariabletoken == null && bvariable != null && expression == null) {
+                if (arrayvariabletoken == null && bvariable != null && expression != null) {
                         System.out.println("HIT HERE HERE");
-                        {if ("" != null) return new ASTAssignmentStatement(passedinvariable, expression, arrayvariabletoken.beginLine);}
+                        {if ("" != null) return new ASTAssignmentStatement(bvariable, expression, generaltoken.beginLine);}
                 }
                 if (expression == null || bvariable == null) {System.out.println("HIT HERE"); {if ("" != null) return null;}}
                 else {{if ("" != null) return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);}}
@@ -752,7 +752,7 @@ result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
     throw new Error("Missing return statement in function");
   }
 
-  static final public ASTExpression F() throws ParseException {Token t; ASTExpression value = null; ASTVariable variable = null; ASTVariableExpression variableexpression= null;
+  static final public ASTExpression F() throws ParseException {Token t; ASTExpression value = null; ASTVariable variable = null; ASTVariableExpression variableexpression= null; ASTVariable returnvariable = null;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case MINUS:{
       jj_consume_token(MINUS);
@@ -785,7 +785,7 @@ variable = new ASTBaseVariable(t.image, t.beginLine);
       case ADD:
       case MINUSMINUS:
       case IDENTIFIER:{
-        followsvariablenamesforexpressions(variable);
+        variable = followsvariablenamesforexpressions(variable);
         break;
         }
       default:
@@ -865,64 +865,82 @@ variableexpression = new ASTVariableExpression(variable, variable.line());
     }
   }
 
-  static final public ASTVariable followsvariables(ASTVariable astvar) throws ParseException {ASTArrayVariable arrayvar; ASTExpression express; ASTVariable nextvariable; Token variabletoken = null;
+  static final public ASTVariable followsvariables(ASTVariable astvar) throws ParseException {ASTArrayVariable arrayvar; ASTExpression express; ASTClassVariable nextvariable; Token variabletoken = null; ASTVariable returnvariable = null; ASTVariable nullcase = null; ASTBaseVariable basevariable;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case PERIOD:{
-      label_18:
-      while (true) {
-        jj_consume_token(PERIOD);
-        variabletoken = jj_consume_token(IDENTIFIER);
-nextvariable = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case PERIOD:{
-          ;
-          break;
-          }
-        default:
-          jj_la1[37] = jj_gen;
-          break label_18;
-        }
-      }
+      jj_consume_token(PERIOD);
+      variabletoken = jj_consume_token(IDENTIFIER);
+nextvariable = new ASTClassVariable(astvar, variabletoken.image, variabletoken.beginLine);
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case LEFT_BRACKET:
       case PERIOD:{
-        followsvariables(nextvariable);
+        returnvariable = followsvariables(nextvariable);
+        break;
+        }
+      default:
+        jj_la1[37] = jj_gen;
+        ;
+      }
+System.out.println("Hello");
+if (returnvariable == null) {
+                                {if ("" != null) return nextvariable;}
+                                }
+                        else {
+                                {if ("" != null) return returnvariable;}
+                                }
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case LEFT_BRACKET:
+      case PERIOD:{
+        returnvariable = followsvariables(astvar);
+System.out.println("HITTER");
+                {if ("" != null) return returnvariable;}
         break;
         }
       default:
         jj_la1[38] = jj_gen;
         ;
       }
-{if ("" != null) return new ASTClassVariable(astvar, variabletoken.image, variabletoken.beginLine);}
+System.out.println("YELLO");
+{if ("" != null) return nextvariable;}
       break;
       }
     case LEFT_BRACKET:{
-      label_19:
-      while (true) {
-        jj_consume_token(LEFT_BRACKET);
-        express = expression();
-        variabletoken = jj_consume_token(RIGHT_BRACKET);
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case LEFT_BRACKET:{
-          ;
-          break;
-          }
-        default:
-          jj_la1[39] = jj_gen;
-          break label_19;
-        }
-      }
-{if ("" != null) return new ASTArrayVariable(astvar, express, variabletoken.beginLine);}
+      jj_consume_token(LEFT_BRACKET);
+      express = expression();
+      variabletoken = jj_consume_token(RIGHT_BRACKET);
+arrayvar =  new ASTArrayVariable(astvar, express, variabletoken.beginLine);
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case LEFT_BRACKET:
       case PERIOD:{
-        followsvariables(astvar);
+        returnvariable = followsvariables(arrayvar);
+        break;
+        }
+      default:
+        jj_la1[39] = jj_gen;
+        ;
+      }
+System.out.println("Hello");
+if (returnvariable == null) {
+                                                {if ("" != null) return arrayvar;}
+                                                }
+                                        else {
+                                                {if ("" != null) return returnvariable;}
+                                                }
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case LEFT_BRACKET:
+      case PERIOD:{
+        returnvariable = followsvariables(astvar);
+System.out.println("HITTER");
+                {if ("" != null) return returnvariable;}
         break;
         }
       default:
         jj_la1[40] = jj_gen;
         ;
       }
+System.out.println("YELLO");
+{if ("" != null) return arrayvar;}
+{if ("" != null) return nullcase;}
       break;
       }
     default:
@@ -986,13 +1004,15 @@ nextvariable = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine)
     throw new Error("Missing return statement in function");
   }
 
-  static final public ASTVariable followsvariablenamesforexpressions(ASTVariable variable) throws ParseException {ASTExpression result = null; ASTArrayVariable arrayvar = null; ASTBaseVariable basevar = null; Token variabletoken;
+  static final public ASTVariable followsvariablenamesforexpressions(ASTVariable variable) throws ParseException {ASTExpression result = null; ASTArrayVariable arrayvar = null; ASTClassVariable classvar = null; Token variabletoken; ASTBaseVariable basevar = null; ASTVariable returnvariable = null;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case IDENTIFIER:{
       /* Double question mark might be overkill, question mark here and it's caller has ? as well */
+      
+      
               variabletoken = jj_consume_token(IDENTIFIER);
 basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);
-      label_20:
+      label_18:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case LEFT_BRACKET:
@@ -1006,28 +1026,16 @@ basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);
           }
         default:
           jj_la1[45] = jj_gen;
-          break label_20;
+          break label_18;
         }
         followsvariablenamesforexpressions(basevar);
       }
       break;
       }
     case PERIOD:{
-      label_21:
-      while (true) {
-        jj_consume_token(PERIOD);
-        variabletoken = jj_consume_token(IDENTIFIER);
-basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case PERIOD:{
-          ;
-          break;
-          }
-        default:
-          jj_la1[46] = jj_gen;
-          break label_21;
-        }
-      }
+      jj_consume_token(PERIOD);
+      variabletoken = jj_consume_token(IDENTIFIER);
+classvar = new ASTClassVariable(variable, variabletoken.image, variabletoken.beginLine);
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case LEFT_BRACKET:
       case PERIOD:
@@ -1035,14 +1043,39 @@ basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);
       case ADD:
       case MINUSMINUS:
       case IDENTIFIER:{
-        followsvariablenamesforexpressions(basevar);
+        returnvariable = followsvariablenamesforexpressions(classvar);
+        break;
+        }
+      default:
+        jj_la1[46] = jj_gen;
+        ;
+      }
+System.out.println("JACK");
+if (returnvariable == null) {
+                System.out.println("Retuning classvar.");
+                {if ("" != null) return classvar;}
+                }
+        else {
+                {if ("" != null) return returnvariable;}
+                }
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case LEFT_BRACKET:
+      case PERIOD:
+      case LEFT_PARENTHESIS:
+      case ADD:
+      case MINUSMINUS:
+      case IDENTIFIER:{
+        returnvariable = followsvariablenamesforexpressions(variable);
+System.out.println("BBBBBBB");
+        {if ("" != null) return returnvariable;}
         break;
         }
       default:
         jj_la1[47] = jj_gen;
         ;
       }
-{if ("" != null) return new ASTClassVariable(variable, variabletoken.image, variabletoken.beginLine);}
+System.out.println("AAAAAA");
+{if ("" != null) return classvar;}
       break;
       }
     case LEFT_PARENTHESIS:{
@@ -1066,7 +1099,7 @@ basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);
       jj_consume_token(RIGHT_PARENTHESIS);
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case PERIOD:{
-        label_22:
+        label_19:
         while (true) {
           jj_consume_token(PERIOD);
           variabletoken = jj_consume_token(IDENTIFIER);
@@ -1078,7 +1111,7 @@ basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);
             }
           default:
             jj_la1[49] = jj_gen;
-            break label_22;
+            break label_19;
           }
         }
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -1104,21 +1137,10 @@ basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);
       break;
       }
     case LEFT_BRACKET:{
-      label_23:
-      while (true) {
-        jj_consume_token(LEFT_BRACKET);
-        expression();
-        jj_consume_token(RIGHT_BRACKET);
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case LEFT_BRACKET:{
-          ;
-          break;
-          }
-        default:
-          jj_la1[52] = jj_gen;
-          break label_23;
-        }
-      }
+      jj_consume_token(LEFT_BRACKET);
+      result = expression();
+      variabletoken = jj_consume_token(RIGHT_BRACKET);
+arrayvar = new ASTArrayVariable(variable, result, variabletoken.beginLine);
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case LEFT_BRACKET:
       case PERIOD:
@@ -1126,13 +1148,35 @@ basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);
       case ADD:
       case MINUSMINUS:
       case IDENTIFIER:{
-        followsvariablenamesforexpressions(basevar);
+        returnvariable = followsvariablenamesforexpressions(arrayvar);
+        break;
+        }
+      default:
+        jj_la1[52] = jj_gen;
+        ;
+      }
+if (returnvariable == null) {
+                        {if ("" != null) return arrayvar;}
+                        }
+                else {
+                        {if ("" != null) return returnvariable;}
+                        }
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case LEFT_BRACKET:
+      case PERIOD:
+      case LEFT_PARENTHESIS:
+      case ADD:
+      case MINUSMINUS:
+      case IDENTIFIER:{
+        returnvariable = followsvariablenamesforexpressions(variable);
+{if ("" != null) return returnvariable;}
         break;
         }
       default:
         jj_la1[53] = jj_gen;
         ;
       }
+{if ("" != null) return arrayvar;}
       break;
       }
     case ADD:
@@ -1159,7 +1203,7 @@ basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);
     value = expression();
     jj_consume_token(RIGHT_BRACKET);
 counter++;
-    label_24:
+    label_20:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case LEFT_BRACKET:{
@@ -1168,7 +1212,7 @@ counter++;
         }
       default:
         jj_la1[55] = jj_gen;
-        break label_24;
+        break label_20;
       }
       jj_consume_token(LEFT_BRACKET);
       jj_consume_token(RIGHT_BRACKET);
@@ -1196,10 +1240,10 @@ counter++;
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x10000,0x0,0x0,0x2048f000,0x20400000,0x2048f000,0x20400000,0x0,0x40000000,0x0,0x0,0x2048f000,0x40000000,0x10960000,0x10960000,0x2048f000,0x0,0x0,0x2048f000,0x800,0x0,0x0,0x0,0x0,0x0,0x0,0x10000000,0xc000000,0xc000000,0xa00000,0xa00000,0x3000000,0x3000000,0x40000000,0x960000,0x40000000,0x0,0x0,0x40000000,0x40000000,0x40000000,0x40000000,0x10960000,0x0,0x0,0x40000000,0x0,0x40000000,0x10960000,0x0,0x40000000,0x0,0x40000000,0x40000000,0x40000000,0x40000000,};
+      jj_la1_0 = new int[] {0x10000,0x0,0x0,0x2048f000,0x20400000,0x2048f000,0x20400000,0x0,0x40000000,0x0,0x0,0x2048f000,0x40000000,0x10960000,0x10960000,0x2048f000,0x0,0x0,0x2048f000,0x800,0x0,0x0,0x0,0x0,0x0,0x0,0x10000000,0xc000000,0xc000000,0xa00000,0xa00000,0x3000000,0x3000000,0x40000000,0x960000,0x40000000,0x0,0x40000000,0x40000000,0x40000000,0x40000000,0x40000000,0x10960000,0x0,0x0,0x40000000,0x40000000,0x40000000,0x10960000,0x0,0x40000000,0x0,0x40000000,0x40000000,0x40000000,0x40000000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x8000,0x8000,0x8000,0x0,0x8000,0x0,0x2,0x0,0x8000,0x2,0x8000,0x1,0xc020,0xc020,0x8000,0x8000,0x3420,0x8000,0x0,0x3400,0x3420,0x8000,0x8000,0x800,0x8,0x0,0x384,0x384,0x0,0x0,0x0,0x0,0xb021,0xc020,0x20,0x3000,0x1,0x1,0x0,0x1,0x1,0xc020,0x3420,0x3420,0xb021,0x1,0xb021,0xc020,0x1,0xb021,0x1,0x0,0xb021,0xb021,0x0,};
+      jj_la1_1 = new int[] {0x0,0x8000,0x8000,0x8000,0x0,0x8000,0x0,0x2,0x0,0x8000,0x2,0x8000,0x1,0xc020,0xc020,0x8000,0x8000,0x3420,0x8000,0x0,0x3400,0x3420,0x8000,0x8000,0x800,0x8,0x0,0x384,0x384,0x0,0x0,0x0,0x0,0xb021,0xc020,0x20,0x3000,0x1,0x1,0x1,0x1,0x1,0xc020,0x3420,0x3420,0xb021,0xb021,0xb021,0xc020,0x1,0xb021,0x1,0xb021,0xb021,0xb021,0x0,};
    }
 
   /** Constructor with InputStream. */
