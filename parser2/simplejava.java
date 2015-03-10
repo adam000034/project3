@@ -220,8 +220,10 @@ if (counter == 0) {
     throw new Error("Missing return statement in function");
   }
 
-  static final public void expressionlist() throws ParseException {
-    expression();
+  static final public ASTFunctionCallExpression expressionlist(String nameoffunction, Token variabletoken) throws ParseException {ASTExpression expressioncatch; ASTFunctionCallExpression funccall; ASTFunctionCallStatement callstatement;
+funccall=new ASTFunctionCallExpression(nameoffunction, variabletoken.beginLine);
+    expressioncatch = expression();
+funccall.addElement(expressioncatch);
     label_8:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -234,8 +236,11 @@ if (counter == 0) {
         break label_8;
       }
       jj_consume_token(COMMA);
-      expression();
+      expressioncatch = expression();
+funccall.addElement(expressioncatch);
     }
+{if ("" != null) return funccall;}
+    throw new Error("Missing return statement in function");
   }
 
   static final public void statementlist() throws ParseException {
@@ -406,7 +411,7 @@ avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beg
       case GETS:
       case ADD:
       case MINUSMINUS:{
-        expression = followsvariablenames();
+        expression = followsvariablenames(generaltoken);
         break;
         }
       default:
@@ -539,7 +544,7 @@ returnstate = new ASTEmptyStatement(semicolontoken.beginLine);
           jj_la1[21] = jj_gen;
           break label_12;
         }
-        followsvariablenames();
+        followsvariablenames(identifier);
       }
       break;
       }
@@ -785,7 +790,7 @@ variable = new ASTBaseVariable(t.image, t.beginLine);
       case ADD:
       case MINUSMINUS:
       case IDENTIFIER:{
-        variable = followsvariablenamesforexpressions(variable);
+        variable = followsvariablenamesforexpressions(variable, t.image);
         break;
         }
       default:
@@ -951,7 +956,7 @@ System.out.println("YELLO");
     throw new Error("Missing return statement in function");
   }
 
-  static final public ASTExpression followsvariablenames() throws ParseException {ASTExpression value; ASTVariable variable;
+  static final public ASTExpression followsvariablenames(Token token) throws ParseException {ASTExpression value; ASTVariable variable; ASTFunctionCallExpression funccallexpression;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case LEFT_PARENTHESIS:{
       jj_consume_token(LEFT_PARENTHESIS);
@@ -964,7 +969,7 @@ System.out.println("YELLO");
       case LEFT_PARENTHESIS:
       case INTEGER_LITERAL:
       case IDENTIFIER:{
-        expressionlist();
+        expressionlist(token.image, token);
         break;
         }
       default:
@@ -977,7 +982,7 @@ System.out.println("YELLO");
       case GETS:
       case ADD:
       case MINUSMINUS:{
-        followsvariablenames();
+        followsvariablenames(token);
         break;
         }
       default:
@@ -1004,7 +1009,8 @@ System.out.println("YELLO");
     throw new Error("Missing return statement in function");
   }
 
-  static final public ASTVariable followsvariablenamesforexpressions(ASTVariable variable) throws ParseException {ASTExpression result = null; ASTArrayVariable arrayvar = null; ASTClassVariable classvar = null; Token variabletoken; ASTBaseVariable basevar = null; ASTVariable returnvariable = null;
+  static final public ASTVariable followsvariablenamesforexpressions(ASTVariable variable, String nameoffunction) throws ParseException {ASTExpression result = null; ASTArrayVariable arrayvar = null; ASTClassVariable classvar = null; Token variabletoken; ASTBaseVariable basevar = null; ASTVariable returnvariable = null;
+ASTFunctionCallExpression funccall = null;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case IDENTIFIER:{
       /* Double question mark might be overkill, question mark here and it's caller has ? as well */
@@ -1028,7 +1034,7 @@ basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);
           jj_la1[45] = jj_gen;
           break label_18;
         }
-        followsvariablenamesforexpressions(basevar);
+        followsvariablenamesforexpressions(basevar, nameoffunction);
       }
       break;
       }
@@ -1043,7 +1049,7 @@ classvar = new ASTClassVariable(variable, variabletoken.image, variabletoken.beg
       case ADD:
       case MINUSMINUS:
       case IDENTIFIER:{
-        returnvariable = followsvariablenamesforexpressions(classvar);
+        returnvariable = followsvariablenamesforexpressions(classvar, nameoffunction);
         break;
         }
       default:
@@ -1065,7 +1071,7 @@ if (returnvariable == null) {
       case ADD:
       case MINUSMINUS:
       case IDENTIFIER:{
-        returnvariable = followsvariablenamesforexpressions(variable);
+        returnvariable = followsvariablenamesforexpressions(variable, nameoffunction);
 System.out.println("BBBBBBB");
         {if ("" != null) return returnvariable;}
         break;
@@ -1079,7 +1085,7 @@ System.out.println("AAAAAA");
       break;
       }
     case LEFT_PARENTHESIS:{
-      jj_consume_token(LEFT_PARENTHESIS);
+      variabletoken = jj_consume_token(LEFT_PARENTHESIS);
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case TRUE:
       case FALSE:
@@ -1089,31 +1095,20 @@ System.out.println("AAAAAA");
       case LEFT_PARENTHESIS:
       case INTEGER_LITERAL:
       case IDENTIFIER:{
-        expressionlist();
+        result = expressionlist(nameoffunction, variabletoken);
         break;
         }
       default:
         jj_la1[48] = jj_gen;
         ;
       }
+System.out.println("I HIT HERE");
       jj_consume_token(RIGHT_PARENTHESIS);
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case PERIOD:{
-        label_19:
-        while (true) {
-          jj_consume_token(PERIOD);
-          variabletoken = jj_consume_token(IDENTIFIER);
-basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);
-          switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-          case PERIOD:{
-            ;
-            break;
-            }
-          default:
-            jj_la1[49] = jj_gen;
-            break label_19;
-          }
-        }
+        jj_consume_token(PERIOD);
+        variabletoken = jj_consume_token(IDENTIFIER);
+classvar = new ASTClassVariable(variable, variabletoken.image, variabletoken.beginLine);
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case LEFT_BRACKET:
         case PERIOD:
@@ -1121,19 +1116,26 @@ basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);
         case ADD:
         case MINUSMINUS:
         case IDENTIFIER:{
-          followsvariablenamesforexpressions(basevar);
+          returnvariable = followsvariablenamesforexpressions(classvar, nameoffunction);
           break;
           }
         default:
-          jj_la1[50] = jj_gen;
+          jj_la1[49] = jj_gen;
           ;
         }
+if (returnvariable == null) {
+                {if ("" != null) return classvar;}
+        }
+        else {
+                {if ("" != null) return returnvariable;}
+                }
         break;
         }
       default:
-        jj_la1[51] = jj_gen;
+        jj_la1[50] = jj_gen;
         ;
       }
+{if ("" != null) return variable;}
       break;
       }
     case LEFT_BRACKET:{
@@ -1148,11 +1150,11 @@ arrayvar = new ASTArrayVariable(variable, result, variabletoken.beginLine);
       case ADD:
       case MINUSMINUS:
       case IDENTIFIER:{
-        returnvariable = followsvariablenamesforexpressions(arrayvar);
+        returnvariable = followsvariablenamesforexpressions(arrayvar, nameoffunction);
         break;
         }
       default:
-        jj_la1[52] = jj_gen;
+        jj_la1[51] = jj_gen;
         ;
       }
 if (returnvariable == null) {
@@ -1168,12 +1170,12 @@ if (returnvariable == null) {
       case ADD:
       case MINUSMINUS:
       case IDENTIFIER:{
-        returnvariable = followsvariablenamesforexpressions(variable);
+        returnvariable = followsvariablenamesforexpressions(variable, nameoffunction);
 {if ("" != null) return returnvariable;}
         break;
         }
       default:
-        jj_la1[53] = jj_gen;
+        jj_la1[52] = jj_gen;
         ;
       }
 {if ("" != null) return arrayvar;}
@@ -1185,7 +1187,7 @@ if (returnvariable == null) {
       break;
       }
     default:
-      jj_la1[54] = jj_gen;
+      jj_la1[53] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -1203,7 +1205,7 @@ if (returnvariable == null) {
     value = expression();
     jj_consume_token(RIGHT_BRACKET);
 counter++;
-    label_20:
+    label_19:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case LEFT_BRACKET:{
@@ -1211,8 +1213,8 @@ counter++;
         break;
         }
       default:
-        jj_la1[55] = jj_gen;
-        break label_20;
+        jj_la1[54] = jj_gen;
+        break label_19;
       }
       jj_consume_token(LEFT_BRACKET);
       jj_consume_token(RIGHT_BRACKET);
@@ -1232,7 +1234,7 @@ counter++;
   static public Token jj_nt;
   static private int jj_ntk;
   static private int jj_gen;
-  static final private int[] jj_la1 = new int[56];
+  static final private int[] jj_la1 = new int[55];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -1240,10 +1242,10 @@ counter++;
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x10000,0x0,0x0,0x2048f000,0x20400000,0x2048f000,0x20400000,0x0,0x40000000,0x0,0x0,0x2048f000,0x40000000,0x10960000,0x10960000,0x2048f000,0x0,0x0,0x2048f000,0x800,0x0,0x0,0x0,0x0,0x0,0x0,0x10000000,0xc000000,0xc000000,0xa00000,0xa00000,0x3000000,0x3000000,0x40000000,0x960000,0x40000000,0x0,0x40000000,0x40000000,0x40000000,0x40000000,0x40000000,0x10960000,0x0,0x0,0x40000000,0x40000000,0x40000000,0x10960000,0x0,0x40000000,0x0,0x40000000,0x40000000,0x40000000,0x40000000,};
+      jj_la1_0 = new int[] {0x10000,0x0,0x0,0x2048f000,0x20400000,0x2048f000,0x20400000,0x0,0x40000000,0x0,0x0,0x2048f000,0x40000000,0x10960000,0x10960000,0x2048f000,0x0,0x0,0x2048f000,0x800,0x0,0x0,0x0,0x0,0x0,0x0,0x10000000,0xc000000,0xc000000,0xa00000,0xa00000,0x3000000,0x3000000,0x40000000,0x960000,0x40000000,0x0,0x40000000,0x40000000,0x40000000,0x40000000,0x40000000,0x10960000,0x0,0x0,0x40000000,0x40000000,0x40000000,0x10960000,0x40000000,0x0,0x40000000,0x40000000,0x40000000,0x40000000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x8000,0x8000,0x8000,0x0,0x8000,0x0,0x2,0x0,0x8000,0x2,0x8000,0x1,0xc020,0xc020,0x8000,0x8000,0x3420,0x8000,0x0,0x3400,0x3420,0x8000,0x8000,0x800,0x8,0x0,0x384,0x384,0x0,0x0,0x0,0x0,0xb021,0xc020,0x20,0x3000,0x1,0x1,0x1,0x1,0x1,0xc020,0x3420,0x3420,0xb021,0xb021,0xb021,0xc020,0x1,0xb021,0x1,0xb021,0xb021,0xb021,0x0,};
+      jj_la1_1 = new int[] {0x0,0x8000,0x8000,0x8000,0x0,0x8000,0x0,0x2,0x0,0x8000,0x2,0x8000,0x1,0xc020,0xc020,0x8000,0x8000,0x3420,0x8000,0x0,0x3400,0x3420,0x8000,0x8000,0x800,0x8,0x0,0x384,0x384,0x0,0x0,0x0,0x0,0xb021,0xc020,0x20,0x3000,0x1,0x1,0x1,0x1,0x1,0xc020,0x3420,0x3420,0xb021,0xb021,0xb021,0xc020,0xb021,0x1,0xb021,0xb021,0xb021,0x0,};
    }
 
   /** Constructor with InputStream. */
@@ -1264,7 +1266,7 @@ counter++;
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 56; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 55; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -1278,7 +1280,7 @@ counter++;
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 56; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 55; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -1295,7 +1297,7 @@ counter++;
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 56; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 55; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -1305,7 +1307,7 @@ counter++;
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 56; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 55; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -1321,7 +1323,7 @@ counter++;
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 56; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 55; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -1330,7 +1332,7 @@ counter++;
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 56; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 55; i++) jj_la1[i] = -1;
   }
 
   static private Token jj_consume_token(int kind) throws ParseException {
@@ -1386,7 +1388,7 @@ counter++;
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 56; i++) {
+    for (int i = 0; i < 55; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
