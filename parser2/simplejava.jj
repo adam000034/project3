@@ -270,7 +270,7 @@ ASTVariable bvariable = null; ASTBaseVariable basevariable = null; ASTIfStatemen
 }
 
 ASTIfStatement ifstatement() :
-{ASTIfStatement ifstatementtest; ASTExpression test; ASTStatement thenstatement; ASTStatement elsestatement = null; int line; Token andcapture=null; Token orcapture=null; ASTExpression rightsideequal = null; Token linenumbercatcher;}
+{ASTExpression test; ASTStatement thenstatement; ASTStatement elsestatement = null; Token linenumbercatcher;}
 {
 	linenumbercatcher = <LEFT_PARENTHESIS> test = expression() <RIGHT_PARENTHESIS> thenstatement = statement() ((LOOKAHEAD(1) <ELSE> elsestatement = statement())?) 
 	{return new ASTIfStatement(test, thenstatement, elsestatement, linenumbercatcher.beginLine);}

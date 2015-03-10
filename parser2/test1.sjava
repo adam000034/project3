@@ -1,6 +1,3 @@
-   if (x>3)
-       x = 0;
-
 x[3] = y;
 x[3][4].foo[8].bar[x.y][3].z.w.x[x.y.z] = y;
 void main() {

@@ -461,7 +461,7 @@ avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beg
     throw new Error("Missing return statement in function");
   }
 
-  static final public ASTIfStatement ifstatement() throws ParseException {ASTIfStatement ifstatementtest; ASTExpression test; ASTStatement thenstatement; ASTStatement elsestatement = null; int line; Token andcapture=null; Token orcapture=null; ASTExpression rightsideequal = null; Token linenumbercatcher;
+  static final public ASTIfStatement ifstatement() throws ParseException {ASTExpression test; ASTStatement thenstatement; ASTStatement elsestatement = null; Token linenumbercatcher;
     linenumbercatcher = jj_consume_token(LEFT_PARENTHESIS);
     test = expression();
     jj_consume_token(RIGHT_PARENTHESIS);
