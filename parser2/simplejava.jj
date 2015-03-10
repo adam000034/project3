@@ -253,7 +253,11 @@ ASTVariable bvariable = null; ASTBaseVariable basevariable = null; ASTIfStatemen
 			return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, bracketcounter, expression, generaltoken.beginLine);
 		}
 		/* This handles the case: */
-		if (expression == null) {return null;} 
+		if (arrayvariabletoken == null && bvariable != null && expression == null) {
+			System.out.println("HIT HERE HERE");
+			return new ASTAssignmentStatement(passedinvariable, expression, arrayvariabletoken.beginLine);
+		}
+		if (expression == null || bvariable == null) {System.out.println("HIT HERE"); return null;} 
 		else {return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);} 
 		
 	}
@@ -438,7 +442,7 @@ ASTVariable followsvariables(ASTVariable astvar) :
 	((<PERIOD> variabletoken = <IDENTIFIER> {nextvariable = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);})+) ((followsvariables(nextvariable))?) {return new ASTClassVariable(astvar, variabletoken.image, variabletoken.beginLine);}
 	//TOKEN USED IN SECOND CASE JUST TO CAPTURE LINE NUMBER FOR NOW
 	/* {astvar = null;} */
-|	((<LEFT_BRACKET> express = expression() variabletoken = <RIGHT_BRACKET>)+) ((followsvariables(astvar))?) {return new ASTArrayVariable(astvar, express, variabletoken.beginLine);}
+|	((<LEFT_BRACKET> express = expression() variabletoken = <RIGHT_BRACKET>)+) {return new ASTArrayVariable(astvar, express, variabletoken.beginLine);} ((followsvariables(astvar))?) 
 }
 
 ASTExpression followsvariablenames() :

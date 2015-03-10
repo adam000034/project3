@@ -423,7 +423,11 @@ avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beg
                         {if ("" != null) return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, bracketcounter, expression, generaltoken.beginLine);}
                 }
                 /* This handles the case: */
-                if (expression == null) {{if ("" != null) return null;}}
+                if (arrayvariabletoken == null && bvariable != null && expression == null) {
+                        System.out.println("HIT HERE HERE");
+                        {if ("" != null) return new ASTAssignmentStatement(passedinvariable, expression, arrayvariabletoken.beginLine);}
+                }
+                if (expression == null || bvariable == null) {System.out.println("HIT HERE"); {if ("" != null) return null;}}
                 else {{if ("" != null) return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);}}
       break;
       }
@@ -919,7 +923,7 @@ nextvariable = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine)
           break label_19;
         }
       }
-astvar = null;
+{if ("" != null) return new ASTArrayVariable(astvar, express, variabletoken.beginLine);}
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case LEFT_BRACKET:
       case PERIOD:{
@@ -930,7 +934,6 @@ astvar = null;
         jj_la1[43] = jj_gen;
         ;
       }
-{if ("" != null) return new ASTArrayVariable(astvar, express, variabletoken.beginLine);}
       break;
       }
     default:
