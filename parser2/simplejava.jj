@@ -209,13 +209,17 @@ ASTClass classdefinitions() :
 
 ASTStatement statement() :
 /* POSSIBLE PROBLEMS WITH INTIALIZING ARRAYVARIABLETOKEN TO BE NULL */
-{ASTAssignmentStatement assignstate; ASTVariable avariable = null; Token arrayvariabletoken = null; ASTExpression expression = null; int bracketcounter= 0; Token generaltoken; ASTVariable passedinvariable; ASTStatements returner = new ASTStatements();
+{ASTForStatement forstatement; ASTDoWhileStatement dowhile; ASTStatement body; ASTAssignmentStatement assignstate; ASTVariable avariable = null; Token arrayvariabletoken = null; ASTExpression expression = null; int bracketcounter= 0; Token generaltoken; ASTVariable passedinvariable; ASTStatements returner = new ASTStatements();
 ASTVariable bvariable = null; ASTBaseVariable basevariable = null; ASTIfStatement ifstatement;}
 {
-	dowhilestatement()
-|	<RETURN> expression() <SEMICOLON>
-|	<WHILE> <LEFT_PARENTHESIS> test() <RIGHT_PARENTHESIS> statement()
-|	generaltoken = <IF> ifstatement = ifstatement() {return ifstatement;}
+	dowhile = dowhilestatement() 
+	{return dowhile;}
+|	generaltoken = <RETURN> ((expression = expression())?) <SEMICOLON> 
+	{return new ASTReturnStatement(expression, generaltoken.beginLine);}
+|	generaltoken = <WHILE> <LEFT_PARENTHESIS> expression = expression() <RIGHT_PARENTHESIS> body = statement()
+	{return new ASTWhileStatement(expression, body, generaltoken.beginLine);}
+|	generaltoken = <IF> ifstatement = ifstatement() 
+	{return ifstatement;}
 |	forstatement()
 |	<LEFT_BRACE> ((statement())*) <RIGHT_BRACE>
 
@@ -265,32 +269,11 @@ ASTVariable bvariable = null; ASTBaseVariable basevariable = null; ASTIfStatemen
 |	emptystatement()
 }
 
-void test() :
-{}
-{
-/*	booleanexpression()
-|	<IDENTIFIER> ((expressionsversionfollowsvariablenames())?) */
-expression()
-}
-
-
-
 ASTIfStatement ifstatement() :
 {ASTIfStatement ifstatementtest; ASTExpression test; ASTStatement thenstatement; ASTStatement elsestatement = null; int line; Token andcapture=null; Token orcapture=null; ASTExpression rightsideequal = null; Token linenumbercatcher;}
 {
-	linenumbercatcher = <LEFT_PARENTHESIS> test = expression() (((andcapture = <AND> rightsideequal = expression())?) | ((orcapture = <OR> rightsideequal = expression())?))
-		{
-			if (andcapture != null || orcapture != null && rightsideequal != null) {
-				if (orcapture == null) {
-					test = new ASTOperatorExpression(test, rightsideequal,  andcapture.image, andcapture.beginLine);
-				} else if (andcapture == null) {
-					test = new ASTOperatorExpression(test, rightsideequal, orcapture.image, orcapture.beginLine);
-				}
-			}
-
-		} <RIGHT_PARENTHESIS> thenstatement = statement() ((LOOKAHEAD(1) <ELSE> elsestatement = statement())?)
-		/* HANDLE THE CASE WHERE THERE IS NO ELSESTATEMENT */ 
-		{return new ASTIfStatement(test, thenstatement, elsestatement, linenumbercatcher.beginLine);}
+	linenumbercatcher = <LEFT_PARENTHESIS> test = expression() <RIGHT_PARENTHESIS> thenstatement = statement() ((LOOKAHEAD(1) <ELSE> elsestatement = statement())?) 
+	{return new ASTIfStatement(test, thenstatement, elsestatement, linenumbercatcher.beginLine);}
 }
 
 ASTEmptyStatement emptystatement() :
@@ -301,10 +284,11 @@ ASTEmptyStatement emptystatement() :
 	{return returnstate;}
 }
 
-void dowhilestatement() :
-{}
+ASTDoWhileStatement dowhilestatement() :
+{Token generaltoken; ASTExpression test = null; ASTStatement body;}
 {
-	<DO> statement() <WHILE> <LEFT_PARENTHESIS> expression() (((<AND> expression())?) | ((<OR> expression())?)) <RIGHT_PARENTHESIS> 
+	generaltoken = <DO> body = statement() <WHILE> <LEFT_PARENTHESIS> test = expression() <RIGHT_PARENTHESIS> 
+	{return new ASTDoWhileStatement(test, body, generaltoken.beginLine);} 
 }
 
 void initialization() :
@@ -321,7 +305,7 @@ void forstatement() :
 	/*Second initialization() is actually increment from book */
 	<FOR> <LEFT_PARENTHESIS> 
 		((identifier = <IDENTIFIER> (followsvariablenames())*)?) <SEMICOLON> 
-		test() <SEMICOLON> 
+		expression() <SEMICOLON> 
 		((<IDENTIFIER> initialization())?) 
 		<RIGHT_PARENTHESIS> statement()
 }

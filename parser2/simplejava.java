@@ -312,25 +312,43 @@ astclass = new ASTClass(stringt.image, variabledefs, stringt.beginLine);
     throw new Error("Missing return statement in function");
   }
 
-  static final public ASTStatement statement() throws ParseException {ASTAssignmentStatement assignstate; ASTVariable avariable = null; Token arrayvariabletoken = null; ASTExpression expression = null; int bracketcounter= 0; Token generaltoken; ASTVariable passedinvariable; ASTStatements returner = new ASTStatements();
+  static final public ASTStatement statement() throws ParseException {ASTForStatement forstatement; ASTDoWhileStatement dowhile; ASTStatement body; ASTAssignmentStatement assignstate; ASTVariable avariable = null; Token arrayvariabletoken = null; ASTExpression expression = null; int bracketcounter= 0; Token generaltoken; ASTVariable passedinvariable; ASTStatements returner = new ASTStatements();
 ASTVariable bvariable = null; ASTBaseVariable basevariable = null; ASTIfStatement ifstatement;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case DO:{
-      dowhilestatement();
+      dowhile = dowhilestatement();
+{if ("" != null) return dowhile;}
       break;
       }
     case RETURN:{
-      jj_consume_token(RETURN);
-      expression();
+      generaltoken = jj_consume_token(RETURN);
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case TRUE:
+      case FALSE:
+      case NEW:
+      case MINUS:
+      case NOT:
+      case LEFT_PARENTHESIS:
+      case INTEGER_LITERAL:
+      case IDENTIFIER:{
+        expression = expression();
+        break;
+        }
+      default:
+        jj_la1[14] = jj_gen;
+        ;
+      }
       jj_consume_token(SEMICOLON);
+{if ("" != null) return new ASTReturnStatement(expression, generaltoken.beginLine);}
       break;
       }
     case WHILE:{
-      jj_consume_token(WHILE);
+      generaltoken = jj_consume_token(WHILE);
       jj_consume_token(LEFT_PARENTHESIS);
-      test();
+      expression = expression();
       jj_consume_token(RIGHT_PARENTHESIS);
-      statement();
+      body = statement();
+{if ("" != null) return new ASTWhileStatement(expression, body, generaltoken.beginLine);}
       break;
       }
     case IF:{
@@ -360,7 +378,7 @@ ASTVariable bvariable = null; ASTBaseVariable basevariable = null; ASTIfStatemen
           break;
           }
         default:
-          jj_la1[14] = jj_gen;
+          jj_la1[15] = jj_gen;
           break label_11;
         }
         statement();
@@ -379,7 +397,7 @@ avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beg
         break;
         }
       default:
-        jj_la1[15] = jj_gen;
+        jj_la1[16] = jj_gen;
         bvariable = variable(/* MAKE SURE TO MAKE CHANGES, was semicolon before but now is emptystatement because they mean the same thing */
                 passedinvariable);
       }
@@ -392,7 +410,7 @@ avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beg
         break;
         }
       default:
-        jj_la1[16] = jj_gen;
+        jj_la1[17] = jj_gen;
         ;
       }
       emptystatement();
@@ -436,37 +454,16 @@ avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beg
       break;
       }
     default:
-      jj_la1[17] = jj_gen;
+      jj_la1[18] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
     throw new Error("Missing return statement in function");
   }
 
-  static final public void test() throws ParseException {
-    expression();
-  }
-
   static final public ASTIfStatement ifstatement() throws ParseException {ASTIfStatement ifstatementtest; ASTExpression test; ASTStatement thenstatement; ASTStatement elsestatement = null; int line; Token andcapture=null; Token orcapture=null; ASTExpression rightsideequal = null; Token linenumbercatcher;
     linenumbercatcher = jj_consume_token(LEFT_PARENTHESIS);
     test = expression();
-    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-    case AND:{
-      andcapture = jj_consume_token(AND);
-      rightsideequal = expression();
-      break;
-      }
-    default:
-      jj_la1[18] = jj_gen;
-      ;
-    }
-if (andcapture != null || orcapture != null && rightsideequal != null) {
-                                if (orcapture == null) {
-                                        test = new ASTOperatorExpression(test, rightsideequal,  andcapture.image, andcapture.beginLine);
-                                } else if (andcapture == null) {
-                                        test = new ASTOperatorExpression(test, rightsideequal, orcapture.image, orcapture.beginLine);
-                                }
-                        }
     jj_consume_token(RIGHT_PARENTHESIS);
     thenstatement = statement();
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -476,7 +473,7 @@ if (andcapture != null || orcapture != null && rightsideequal != null) {
       break;
       }
     default:
-      jj_la1[20] = jj_gen;
+      jj_la1[19] = jj_gen;
       ;
     }
 {if ("" != null) return new ASTIfStatement(test, thenstatement, elsestatement, linenumbercatcher.beginLine);}
@@ -490,23 +487,15 @@ returnstate = new ASTEmptyStatement(semicolontoken.beginLine);
     throw new Error("Missing return statement in function");
   }
 
-  static final public void dowhilestatement() throws ParseException {
-    jj_consume_token(DO);
-    statement();
+  static final public ASTDoWhileStatement dowhilestatement() throws ParseException {Token generaltoken; ASTExpression test = null; ASTStatement body;
+    generaltoken = jj_consume_token(DO);
+    body = statement();
     jj_consume_token(WHILE);
     jj_consume_token(LEFT_PARENTHESIS);
-    expression();
-    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-    case AND:{
-      jj_consume_token(AND);
-      expression();
-      break;
-      }
-    default:
-      jj_la1[21] = jj_gen;
-      ;
-    }
+    test = expression();
     jj_consume_token(RIGHT_PARENTHESIS);
+{if ("" != null) return new ASTDoWhileStatement(test, body, generaltoken.beginLine);}
+    throw new Error("Missing return statement in function");
   }
 
   static final public void initialization() throws ParseException {
@@ -524,7 +513,7 @@ returnstate = new ASTEmptyStatement(semicolontoken.beginLine);
       break;
       }
     default:
-      jj_la1[23] = jj_gen;
+      jj_la1[20] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -547,7 +536,7 @@ returnstate = new ASTEmptyStatement(semicolontoken.beginLine);
           break;
           }
         default:
-          jj_la1[24] = jj_gen;
+          jj_la1[21] = jj_gen;
           break label_12;
         }
         followsvariablenames();
@@ -555,11 +544,11 @@ returnstate = new ASTEmptyStatement(semicolontoken.beginLine);
       break;
       }
     default:
-      jj_la1[25] = jj_gen;
+      jj_la1[22] = jj_gen;
       ;
     }
     jj_consume_token(SEMICOLON);
-    test();
+    expression();
     jj_consume_token(SEMICOLON);
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case IDENTIFIER:{
@@ -568,7 +557,7 @@ returnstate = new ASTEmptyStatement(semicolontoken.beginLine);
       break;
       }
     default:
-      jj_la1[26] = jj_gen;
+      jj_la1[23] = jj_gen;
       ;
     }
     jj_consume_token(RIGHT_PARENTHESIS);
@@ -585,7 +574,7 @@ returnstate = new ASTEmptyStatement(semicolontoken.beginLine);
         break;
         }
       default:
-        jj_la1[27] = jj_gen;
+        jj_la1[24] = jj_gen;
         break label_13;
       }
       t = jj_consume_token(OR);
@@ -606,7 +595,7 @@ result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
         break;
         }
       default:
-        jj_la1[28] = jj_gen;
+        jj_la1[25] = jj_gen;
         break label_14;
       }
       t = jj_consume_token(AND);
@@ -624,7 +613,7 @@ result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
       break;
       }
     default:
-      jj_la1[29] = jj_gen;
+      jj_la1[26] = jj_gen;
       ;
     }
     rhs = expthree();
@@ -653,7 +642,7 @@ if (t != null) {
         break;
         }
       default:
-        jj_la1[30] = jj_gen;
+        jj_la1[27] = jj_gen;
         break label_15;
       }
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -682,7 +671,7 @@ if (t != null) {
         break;
         }
       default:
-        jj_la1[31] = jj_gen;
+        jj_la1[28] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -704,7 +693,7 @@ result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
         break;
         }
       default:
-        jj_la1[32] = jj_gen;
+        jj_la1[29] = jj_gen;
         break label_16;
       }
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -717,7 +706,7 @@ result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
         break;
         }
       default:
-        jj_la1[33] = jj_gen;
+        jj_la1[30] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -739,7 +728,7 @@ result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
         break;
         }
       default:
-        jj_la1[34] = jj_gen;
+        jj_la1[31] = jj_gen;
         break label_17;
       }
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -752,7 +741,7 @@ result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
         break;
         }
       default:
-        jj_la1[35] = jj_gen;
+        jj_la1[32] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -800,7 +789,7 @@ variable = new ASTBaseVariable(t.image, t.beginLine);
         break;
         }
       default:
-        jj_la1[36] = jj_gen;
+        jj_la1[33] = jj_gen;
         ;
       }
 variableexpression = new ASTVariableExpression(variable, variable.line());
@@ -822,7 +811,7 @@ variableexpression = new ASTVariableExpression(variable, variable.line());
       break;
       }
     default:
-      jj_la1[37] = jj_gen;
+      jj_la1[34] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -852,7 +841,7 @@ variableexpression = new ASTVariableExpression(variable, variable.line());
       break;
       }
     default:
-      jj_la1[38] = jj_gen;
+      jj_la1[35] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -870,7 +859,7 @@ variableexpression = new ASTVariableExpression(variable, variable.line());
       break;
       }
     default:
-      jj_la1[39] = jj_gen;
+      jj_la1[36] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -890,7 +879,7 @@ nextvariable = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine)
           break;
           }
         default:
-          jj_la1[40] = jj_gen;
+          jj_la1[37] = jj_gen;
           break label_18;
         }
       }
@@ -901,7 +890,7 @@ nextvariable = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine)
         break;
         }
       default:
-        jj_la1[41] = jj_gen;
+        jj_la1[38] = jj_gen;
         ;
       }
 {if ("" != null) return new ASTClassVariable(astvar, variabletoken.image, variabletoken.beginLine);}
@@ -919,7 +908,7 @@ nextvariable = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine)
           break;
           }
         default:
-          jj_la1[42] = jj_gen;
+          jj_la1[39] = jj_gen;
           break label_19;
         }
       }
@@ -931,13 +920,13 @@ nextvariable = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine)
         break;
         }
       default:
-        jj_la1[43] = jj_gen;
+        jj_la1[40] = jj_gen;
         ;
       }
       break;
       }
     default:
-      jj_la1[44] = jj_gen;
+      jj_la1[41] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -961,7 +950,7 @@ nextvariable = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine)
         break;
         }
       default:
-        jj_la1[45] = jj_gen;
+        jj_la1[42] = jj_gen;
         ;
       }
       jj_consume_token(RIGHT_PARENTHESIS);
@@ -974,7 +963,7 @@ nextvariable = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine)
         break;
         }
       default:
-        jj_la1[46] = jj_gen;
+        jj_la1[43] = jj_gen;
         ;
       }
       break;
@@ -990,7 +979,7 @@ nextvariable = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine)
       break;
       }
     default:
-      jj_la1[47] = jj_gen;
+      jj_la1[44] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -1016,7 +1005,7 @@ basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);
           break;
           }
         default:
-          jj_la1[48] = jj_gen;
+          jj_la1[45] = jj_gen;
           break label_20;
         }
         followsvariablenamesforexpressions(basevar);
@@ -1035,7 +1024,7 @@ basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);
           break;
           }
         default:
-          jj_la1[49] = jj_gen;
+          jj_la1[46] = jj_gen;
           break label_21;
         }
       }
@@ -1050,7 +1039,7 @@ basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);
         break;
         }
       default:
-        jj_la1[50] = jj_gen;
+        jj_la1[47] = jj_gen;
         ;
       }
 {if ("" != null) return new ASTClassVariable(variable, variabletoken.image, variabletoken.beginLine);}
@@ -1071,7 +1060,7 @@ basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);
         break;
         }
       default:
-        jj_la1[51] = jj_gen;
+        jj_la1[48] = jj_gen;
         ;
       }
       jj_consume_token(RIGHT_PARENTHESIS);
@@ -1088,7 +1077,7 @@ basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);
             break;
             }
           default:
-            jj_la1[52] = jj_gen;
+            jj_la1[49] = jj_gen;
             break label_22;
           }
         }
@@ -1103,13 +1092,13 @@ basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);
           break;
           }
         default:
-          jj_la1[53] = jj_gen;
+          jj_la1[50] = jj_gen;
           ;
         }
         break;
         }
       default:
-        jj_la1[54] = jj_gen;
+        jj_la1[51] = jj_gen;
         ;
       }
       break;
@@ -1126,7 +1115,7 @@ basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);
           break;
           }
         default:
-          jj_la1[55] = jj_gen;
+          jj_la1[52] = jj_gen;
           break label_23;
         }
       }
@@ -1141,7 +1130,7 @@ basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);
         break;
         }
       default:
-        jj_la1[56] = jj_gen;
+        jj_la1[53] = jj_gen;
         ;
       }
       break;
@@ -1152,7 +1141,7 @@ basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);
       break;
       }
     default:
-      jj_la1[57] = jj_gen;
+      jj_la1[54] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -1178,7 +1167,7 @@ counter++;
         break;
         }
       default:
-        jj_la1[58] = jj_gen;
+        jj_la1[55] = jj_gen;
         break label_24;
       }
       jj_consume_token(LEFT_BRACKET);
@@ -1199,7 +1188,7 @@ counter++;
   static public Token jj_nt;
   static private int jj_ntk;
   static private int jj_gen;
-  static final private int[] jj_la1 = new int[59];
+  static final private int[] jj_la1 = new int[56];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -1207,10 +1196,10 @@ counter++;
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x10000,0x0,0x0,0x2048f000,0x20400000,0x2048f000,0x20400000,0x0,0x40000000,0x0,0x0,0x2048f000,0x40000000,0x10960000,0x2048f000,0x0,0x0,0x2048f000,0x0,0x0,0x800,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x10000000,0xc000000,0xc000000,0xa00000,0xa00000,0x3000000,0x3000000,0x40000000,0x960000,0x40000000,0x0,0x0,0x40000000,0x40000000,0x40000000,0x40000000,0x10960000,0x0,0x0,0x40000000,0x0,0x40000000,0x10960000,0x0,0x40000000,0x0,0x40000000,0x40000000,0x40000000,0x40000000,};
+      jj_la1_0 = new int[] {0x10000,0x0,0x0,0x2048f000,0x20400000,0x2048f000,0x20400000,0x0,0x40000000,0x0,0x0,0x2048f000,0x40000000,0x10960000,0x10960000,0x2048f000,0x0,0x0,0x2048f000,0x800,0x0,0x0,0x0,0x0,0x0,0x0,0x10000000,0xc000000,0xc000000,0xa00000,0xa00000,0x3000000,0x3000000,0x40000000,0x960000,0x40000000,0x0,0x0,0x40000000,0x40000000,0x40000000,0x40000000,0x10960000,0x0,0x0,0x40000000,0x0,0x40000000,0x10960000,0x0,0x40000000,0x0,0x40000000,0x40000000,0x40000000,0x40000000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x8000,0x8000,0x8000,0x0,0x8000,0x0,0x2,0x0,0x8000,0x2,0x8000,0x1,0xc020,0x8000,0x8000,0x3420,0x8000,0x8,0x800,0x0,0x8,0x800,0x3400,0x3420,0x8000,0x8000,0x800,0x8,0x0,0x384,0x384,0x0,0x0,0x0,0x0,0xb021,0xc020,0x20,0x3000,0x1,0x1,0x0,0x1,0x1,0xc020,0x3420,0x3420,0xb021,0x1,0xb021,0xc020,0x1,0xb021,0x1,0x0,0xb021,0xb021,0x0,};
+      jj_la1_1 = new int[] {0x0,0x8000,0x8000,0x8000,0x0,0x8000,0x0,0x2,0x0,0x8000,0x2,0x8000,0x1,0xc020,0xc020,0x8000,0x8000,0x3420,0x8000,0x0,0x3400,0x3420,0x8000,0x8000,0x800,0x8,0x0,0x384,0x384,0x0,0x0,0x0,0x0,0xb021,0xc020,0x20,0x3000,0x1,0x1,0x0,0x1,0x1,0xc020,0x3420,0x3420,0xb021,0x1,0xb021,0xc020,0x1,0xb021,0x1,0x0,0xb021,0xb021,0x0,};
    }
 
   /** Constructor with InputStream. */
@@ -1231,7 +1220,7 @@ counter++;
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 59; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 56; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -1245,7 +1234,7 @@ counter++;
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 59; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 56; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -1262,7 +1251,7 @@ counter++;
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 59; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 56; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -1272,7 +1261,7 @@ counter++;
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 59; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 56; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -1288,7 +1277,7 @@ counter++;
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 59; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 56; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -1297,7 +1286,7 @@ counter++;
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 59; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 56; i++) jj_la1[i] = -1;
   }
 
   static private Token jj_consume_token(int kind) throws ParseException {
@@ -1353,7 +1342,7 @@ counter++;
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 59; i++) {
+    for (int i = 0; i < 56; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
