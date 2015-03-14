@@ -533,9 +533,9 @@ returnstate = new ASTEmptyStatement(semicolontoken.beginLine);
   }
 
   static final public ASTForStatement forstatement() throws ParseException {Token fortoken;
-Token identifier; ASTBaseVariable initvar; ASTExpression initexp = null; ASTAssignmentStatement init;
+Token identifier; ASTBaseVariable initvar; ASTExpression initexp = null; ASTAssignmentStatement init = null;
 ASTExpression test = null;
-Token variable; ASTBaseVariable basevar; ASTExpression incrementexp = null; ASTAssignmentStatement increment;
+Token variable; ASTBaseVariable basevar; ASTExpression incrementexp = null; ASTAssignmentStatement increment = null;
 ASTStatement body;
     /*Second initialization() is actually increment from book */
             fortoken = jj_consume_token(FOR);
@@ -762,7 +762,7 @@ result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
     throw new Error("Missing return statement in function");
   }
 
-  static final public ASTExpression F() throws ParseException {Token t; ASTExpression value = null; ASTVariable variable = null; ASTVariableExpression variableexpression= null; ASTVariable returnvariable = null; ASTExpression functioncallexpression = null;
+  static final public ASTExpression F() throws ParseException {Token t; ASTExpression value = null; ASTVariable variable = null; ASTVariableExpression variableexpression= null; ASTVariable returnvariable = null; ASTExpression functioncallexpression = null; ASTExpression incrementexpression = null;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case MINUS:{
       jj_consume_token(MINUS);
@@ -789,11 +789,10 @@ result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
       t = jj_consume_token(IDENTIFIER);
 variable = new ASTBaseVariable(t.image, t.beginLine);
       functioncallexpression = expressionfunctioncalls(t, variable, t.image);
+      incrementexpression = incrementstatements(variable);
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case LEFT_BRACKET:
       case PERIOD:
-      case ADD:
-      case MINUSMINUS:
       case IDENTIFIER:{
         variable = followsvariablenamesforexpressions(variable, t.image);
         break;
@@ -803,7 +802,15 @@ variable = new ASTBaseVariable(t.image, t.beginLine);
         ;
       }
 variableexpression = new ASTVariableExpression(variable, variable.line());
-{if ("" != null) return variableexpression;}
+if (variableexpression == null && functioncallexpression == null) {
+        {if ("" != null) return incrementexpression;}
+}
+else if (variableexpression == null && incrementexpression == null) {
+        {if ("" != null) return functioncallexpression;}
+}
+else if (functioncallexpression == null && incrementexpression == null) {
+        {if ("" != null) return variableexpression;}
+}
       break;
       }
     case NEW:{
@@ -858,14 +865,16 @@ variableexpression = new ASTVariableExpression(variable, variable.line());
     throw new Error("Missing return statement in function");
   }
 
-  static final public void incrementstatements() throws ParseException {ASTAssignmentStatement assignstatement; ASTVariable variable;
+  static final public ASTExpression incrementstatements(ASTVariable basevar) throws ParseException {ASTAssignmentStatement assignstatement; ASTVariable variable; ASTExpression expression = null;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case ADD:{
-      incrementstatement();
+      /*ASTAssignmentStatement(variable, ASTExpression value, int line) { */
+              expression = incrementstatement(basevar);
       break;
       }
     case MINUSMINUS:{
-      decrementstatement();
+      expression = decrementstatement(basevar);
+{if ("" != null) return expression;}
       break;
       }
     default:
@@ -873,6 +882,7 @@ variableexpression = new ASTVariableExpression(variable, variable.line());
       jj_consume_token(-1);
       throw new ParseException();
     }
+    throw new Error("Missing return statement in function");
   }
 
   static final public ASTVariable followsvariables(ASTVariable astvar) throws ParseException {ASTArrayVariable arrayvar; ASTExpression express; ASTClassVariable nextvariable; Token variabletoken = null; ASTVariable returnvariable = null; ASTVariable nullcase = null; ASTBaseVariable basevariable;
@@ -961,7 +971,7 @@ System.out.println("YELLO");
     throw new Error("Missing return statement in function");
   }
 
-  static final public ASTExpression followsvariablenames(Token token) throws ParseException {ASTExpression value; ASTVariable variable; ASTFunctionCallExpression funccallexpression;
+  static final public ASTExpression followsvariablenames(Token token) throws ParseException {ASTExpression value; ASTVariable variable; ASTFunctionCallExpression funccallexpression; ASTBaseVariable basevar = new ASTBaseVariable(token.image, token.beginLine);
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case LEFT_PARENTHESIS:{
       jj_consume_token(LEFT_PARENTHESIS);
@@ -1003,7 +1013,8 @@ System.out.println("YELLO");
       }
     case ADD:
     case MINUSMINUS:{
-      incrementstatements();
+      value = incrementstatements(basevar);
+{if ("" != null) return value;}
       break;
       }
     default:
@@ -1052,8 +1063,6 @@ basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case LEFT_BRACKET:
         case PERIOD:
-        case ADD:
-        case MINUSMINUS:
         case IDENTIFIER:{
           ;
           break;
@@ -1073,8 +1082,6 @@ classvar = new ASTClassVariable(variable, variabletoken.image, variabletoken.beg
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case LEFT_BRACKET:
       case PERIOD:
-      case ADD:
-      case MINUSMINUS:
       case IDENTIFIER:{
         returnvariable = followsvariablenamesforexpressions(classvar, nameoffunction);
         break;
@@ -1094,8 +1101,6 @@ if (returnvariable == null) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case LEFT_BRACKET:
       case PERIOD:
-      case ADD:
-      case MINUSMINUS:
       case IDENTIFIER:{
         returnvariable = followsvariablenamesforexpressions(variable, nameoffunction);
 System.out.println("BBBBBBB");
@@ -1118,8 +1123,6 @@ arrayvar = new ASTArrayVariable(variable, result, variabletoken.beginLine);
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case LEFT_BRACKET:
       case PERIOD:
-      case ADD:
-      case MINUSMINUS:
       case IDENTIFIER:{
         returnvariable = followsvariablenamesforexpressions(arrayvar, nameoffunction);
         break;
@@ -1137,8 +1140,6 @@ if (returnvariable == null) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case LEFT_BRACKET:
       case PERIOD:
-      case ADD:
-      case MINUSMINUS:
       case IDENTIFIER:{
         returnvariable = followsvariablenamesforexpressions(variable, nameoffunction);
 {if ("" != null) return returnvariable;}
@@ -1149,11 +1150,6 @@ if (returnvariable == null) {
         ;
       }
 {if ("" != null) return arrayvar;}
-      break;
-      }
-    case ADD:
-    case MINUSMINUS:{
-      incrementstatements();
       break;
       }
     default:
@@ -1215,7 +1211,7 @@ counter++;
       jj_la1_0 = new int[] {0x10000,0x0,0x0,0x2048f000,0x20400000,0x2048f000,0x20400000,0x0,0x40000000,0x0,0x0,0x2048f000,0x40000000,0x10960000,0x10960000,0x2048f000,0x0,0x0,0x2048f000,0x800,0x0,0x0,0x0,0x0,0x0,0x10000000,0xc000000,0xc000000,0xa00000,0xa00000,0x3000000,0x3000000,0x40000000,0x960000,0x40000000,0x0,0x40000000,0x40000000,0x40000000,0x40000000,0x40000000,0x10960000,0x0,0x0,0x10960000,0x40000000,0x40000000,0x40000000,0x40000000,0x40000000,0x40000000,0x40000000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x8000,0x8000,0x8000,0x0,0x8000,0x0,0x2,0x0,0x8000,0x2,0x8000,0x1,0xc020,0xc020,0x8000,0x8000,0x3420,0x8000,0x0,0x3400,0x8000,0x8000,0x800,0x8,0x0,0x384,0x384,0x0,0x0,0x0,0x0,0xb001,0xc020,0x20,0x3000,0x1,0x1,0x1,0x1,0x1,0xc020,0x3420,0x3420,0xc020,0xb001,0xb001,0xb001,0xb001,0xb001,0xb001,0x0,};
+      jj_la1_1 = new int[] {0x0,0x8000,0x8000,0x8000,0x0,0x8000,0x0,0x2,0x0,0x8000,0x2,0x8000,0x1,0xc020,0xc020,0x8000,0x8000,0x3420,0x8000,0x0,0x3400,0x8000,0x8000,0x800,0x8,0x0,0x384,0x384,0x0,0x0,0x0,0x0,0x8001,0xc020,0x20,0x3000,0x1,0x1,0x1,0x1,0x1,0xc020,0x3420,0x3420,0xc020,0x8001,0x8001,0x8001,0x8001,0x8001,0x8001,0x0,};
    }
 
   /** Constructor with InputStream. */
