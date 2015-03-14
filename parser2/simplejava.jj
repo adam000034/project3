@@ -79,16 +79,18 @@ TOKEN :
 
 }
 
-void incrementstatement() :
+ASTOperatorExpression incrementstatement(ASTVariable variable) :
 {}
 {
-	<ADD>
+	<ADD>	
+	{return new ASTOperatorExpression(new ASTVariableExpression(variable, variable.line()), new ASTIntegerLiteral(1, variable.line()), "+", variable.line());}
 }
 
-void decrementstatement() :
+ASTOperatorExpression decrementstatement(ASTVariable variable) :
 {}
 {
-	<MINUSMINUS>
+	<MINUSMINUS>	
+	{return new ASTOperatorExpression(new ASTVariableExpression(variable, variable.line()), new ASTIntegerLiteral(1, variable.line()), "-", variable.line());}
 }
 
 void program() :
@@ -295,23 +297,40 @@ ASTDoWhileStatement dowhilestatement() :
 	{return new ASTDoWhileStatement(test, body, generaltoken.beginLine);} 
 }
 
-void initialization() :
-{}
+ASTExpression initialization(ASTVariable variable) :
+{ASTExpression returnval;}
 {
-	incrementstatement()
-|	decrementstatement()
-|	assignmentstatement()
+	returnval = incrementstatement(variable)
+	{return returnval;}
+|	returnval = decrementstatement(variable)
+	{return returnval;}
+|	returnval = assignmentstatement()
+	{return returnval;}
 }
 
-void forstatement() :
-{Token identifier;}
+ASTForStatement forstatement() :
+{Token fortoken;
+Token identifier; ASTBaseVariable initvar; ASTExpression initexp = null; ASTAssignmentStatement init; 
+ASTExpression test = null; 
+Token variable; ASTBaseVariable basevar; ASTExpression incrementexp = null; ASTAssignmentStatement increment;
+ASTStatement body;}
 {
 	/*Second initialization() is actually increment from book */
-	<FOR> <LEFT_PARENTHESIS> 
-		((identifier = <IDENTIFIER> (followsvariablenames(identifier))*)?) <SEMICOLON> 
-		expression() <SEMICOLON> 
-		((<IDENTIFIER> initialization())?) 
-		<RIGHT_PARENTHESIS> statement()
+	fortoken = <FOR> <LEFT_PARENTHESIS> 
+		/* initialization */
+		((identifier = <IDENTIFIER> 
+			{initvar = new ASTBaseVariable(identifier.image, identifier.beginLine);} 
+			initexp = followsvariablenames(identifier) 
+			{init = new ASTAssignmentStatement(initvar, initexp, identifier.beginLine);})?) 
+			<SEMICOLON> 
+		/* test */
+		test = expression() <SEMICOLON>
+		/* increment */ 
+		((variable = <IDENTIFIER> {basevar = new ASTBaseVariable(variable.image, variable.beginLine);} incrementexp = initialization(basevar) 
+			{increment = new ASTAssignmentStatement(basevar, incrementexp, variable.beginLine);} )?) 
+	<RIGHT_PARENTHESIS> 
+		body = statement()
+	{return new ASTForStatement(init, test, increment, body, fortoken.beginLine);} 
 }
 
 ASTExpression expression() :
@@ -396,8 +415,7 @@ ASTExpression F() :
 |	t = <INTEGER_LITERAL> { return new ASTIntegerLiteral(Integer.parseInt(t.image), t.beginLine);}
 |	t = <TRUE> { return new ASTBooleanLiteral(Boolean.parseBoolean(t.image), t.beginLine);}
 |	t = <FALSE> {return new ASTBooleanLiteral(Boolean.parseBoolean(t.image), t.beginLine);}
-|	t = <IDENTIFIER> functioncallexpression = expressionfunctioncalls(t) 
-(({variable = new ASTBaseVariable(t.image, t.beginLine);} variable = followsvariablenamesforexpressions(variable, t.image))?) {variableexpression = new ASTVariableExpression(variable, variable.line());}	{return variableexpression;}
+|	t = <IDENTIFIER> {variable = new ASTBaseVariable(t.image, t.beginLine);} functioncallexpression = expressionfunctioncalls(t, variable) (( variable = followsvariablenamesforexpressions(variable, t.image))?) {variableexpression = new ASTVariableExpression(variable, variable.line());}	{return variableexpression;}
 |	<NEW> t = <IDENTIFIER> value = followsnewandidentifier(t) {return value;}
 |	<LEFT_PARENTHESIS> value = expression()<RIGHT_PARENTHESIS>{return value;}
 }
@@ -484,14 +502,15 @@ ASTExpression followsvariablenames(Token token) :
 |	incrementstatements() 
 }
 
-ASTExpression expressionfunctioncalls(Token token) :
-{ASTExpression expression;}
+ASTExpression expressionfunctioncalls(Token token, ASTVariable variable) :
+{ASTExpression expression; Token variabletoken; ASTFunctionCallExpression funccall;}
 {
 	variabletoken = <LEFT_PARENTHESIS> ((result = expressionlist(token.image, token))?)	{System.out.println("I HIT HERE");}<RIGHT_PARENTHESIS> 
 	(((<PERIOD> variabletoken = <IDENTIFIER> {classvar = new ASTClassVariable(variable, variabletoken.image, variabletoken.beginLine);}
 	) 
 	((returnvariable = followsvariablenamesforexpressions(classvar, nameoffunction))?)
 		{if (returnvariable == null) {
+
 			return classvar;
 		}
 		else {
