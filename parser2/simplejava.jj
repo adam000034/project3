@@ -176,6 +176,7 @@ ASTExpression expressionlist(String nameoffunction, Token variabletoken) :
 {ASTExpression expressioncatch; ASTFunctionCallExpression funccall;}
 {
 /*public ASTFunctionCallStatement(String name, ASTExpression formal, int line) { */
+	{System.out.println("HIT IN EXPRESSIONLIST.");}
     {funccall=new ASTFunctionCallExpression(nameoffunction, variabletoken.beginLine);}
 	expressioncatch = expression() {funccall.addElement(expressioncatch);}((<COMMA>expressioncatch = expression() {funccall.addElement(expressioncatch);})*)
 	{return funccall;}
@@ -415,15 +416,14 @@ ASTExpression F() :
 |	t = <INTEGER_LITERAL> { return new ASTIntegerLiteral(Integer.parseInt(t.image), t.beginLine);}
 |	t = <TRUE> { return new ASTBooleanLiteral(Boolean.parseBoolean(t.image), t.beginLine);}
 |	t = <FALSE> {return new ASTBooleanLiteral(Boolean.parseBoolean(t.image), t.beginLine);}
-|	t = <IDENTIFIER> {variable = new ASTBaseVariable(t.image, t.beginLine);} functioncallexpression = expressionfunctioncalls(t, variable, t.image)
-incrementexpression = incrementstatements(variable) (( variable = followsvariablenamesforexpressions(variable, t.image))?) {variableexpression = new ASTVariableExpression(variable, variable.line());}	{
+|	t = <IDENTIFIER> ((functioncallexpression = expressionfunctioncalls(t, t.image))?) {variable = new ASTBaseVariable(t.image, t.beginLine);} ((incrementexpression = incrementstatements(variable))?)  ((variable = followsvariablenamesforexpressions(variable, t.image))?) {variableexpression = new ASTVariableExpression(variable, variable.line());}	{
 if (variableexpression == null && functioncallexpression == null) {
 	return incrementexpression;
 }
 else if (variableexpression == null && incrementexpression == null) {
 	return functioncallexpression;
 }
-else if (functioncallexpression == null && incrementexpression == null) {
+else {
 	return variableexpression;
 }}
 |	<NEW> t = <IDENTIFIER> value = followsnewandidentifier(t) {return value;}
@@ -515,7 +515,7 @@ ASTExpression followsvariablenames(Token token) :
 |	value = incrementstatements(basevar) {return value;}
 }
 
-ASTExpression expressionfunctioncalls(Token token, ASTVariable variable, String nameoffunction) :
+ASTExpression expressionfunctioncalls(Token token, String nameoffunction) :
 {ASTExpression expression; Token variabletoken; ASTFunctionCallExpression funccall; ASTExpression result = null;}
 {
 	variabletoken = <LEFT_PARENTHESIS> ((result = expressionlist(token.image, token))?)	{System.out.println("I HIT HERE");}<RIGHT_PARENTHESIS>
