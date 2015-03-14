@@ -415,7 +415,7 @@ ASTExpression F() :
 |	t = <INTEGER_LITERAL> { return new ASTIntegerLiteral(Integer.parseInt(t.image), t.beginLine);}
 |	t = <TRUE> { return new ASTBooleanLiteral(Boolean.parseBoolean(t.image), t.beginLine);}
 |	t = <FALSE> {return new ASTBooleanLiteral(Boolean.parseBoolean(t.image), t.beginLine);}
-|	t = <IDENTIFIER> {variable = new ASTBaseVariable(t.image, t.beginLine);} functioncallexpression = expressionfunctioncalls(t, variable) (( variable = followsvariablenamesforexpressions(variable, t.image))?) {variableexpression = new ASTVariableExpression(variable, variable.line());}	{return variableexpression;}
+|	t = <IDENTIFIER> {variable = new ASTBaseVariable(t.image, t.beginLine);} functioncallexpression = expressionfunctioncalls(t, variable, t.image) (( variable = followsvariablenamesforexpressions(variable, t.image))?) {variableexpression = new ASTVariableExpression(variable, variable.line());}	{return variableexpression;}
 |	<NEW> t = <IDENTIFIER> value = followsnewandidentifier(t) {return value;}
 |	<LEFT_PARENTHESIS> value = expression()<RIGHT_PARENTHESIS>{return value;}
 }
@@ -502,23 +502,11 @@ ASTExpression followsvariablenames(Token token) :
 |	incrementstatements() 
 }
 
-ASTExpression expressionfunctioncalls(Token token, ASTVariable variable) :
+ASTExpression expressionfunctioncalls(Token token, ASTVariable variable, String nameoffunction) :
 {ASTExpression expression; Token variabletoken; ASTFunctionCallExpression funccall;}
 {
-	variabletoken = <LEFT_PARENTHESIS> ((result = expressionlist(token.image, token))?)	{System.out.println("I HIT HERE");}<RIGHT_PARENTHESIS> 
-	(((<PERIOD> variabletoken = <IDENTIFIER> {classvar = new ASTClassVariable(variable, variabletoken.image, variabletoken.beginLine);}
-	) 
-	((returnvariable = followsvariablenamesforexpressions(classvar, nameoffunction))?)
-		{if (returnvariable == null) {
-
-			return classvar;
-		}
-		else {
-			return returnvariable;
-			}
-		}
-
-	)?)	{return variable;}
+	variabletoken = <LEFT_PARENTHESIS> ((result = expressionlist(token.image, token))?)	{System.out.println("I HIT HERE");}<RIGHT_PARENTHESIS>
+	{return result;}
 }
 
 ASTVariable followsvariablenamesforexpressions(ASTVariable variable, String nameoffunction) :
