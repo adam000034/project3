@@ -762,7 +762,7 @@ result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
     throw new Error("Missing return statement in function");
   }
 
-  static final public ASTExpression F() throws ParseException {Token t; ASTExpression value = null; ASTVariable variable = null; ASTVariableExpression variableexpression= null; ASTVariable returnvariable = null; ASTFunctionCallExpression functioncallexpression = null;
+  static final public ASTExpression F() throws ParseException {Token t; ASTExpression value = null; ASTVariable variable = null; ASTVariableExpression variableexpression= null; ASTVariable returnvariable = null; ASTExpression functioncallexpression = null;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case MINUS:{
       jj_consume_token(MINUS);
@@ -1014,7 +1014,7 @@ System.out.println("YELLO");
     throw new Error("Missing return statement in function");
   }
 
-  static final public ASTExpression expressionfunctioncalls(Token token, ASTVariable variable, String nameoffunction) throws ParseException {ASTExpression expression; Token variabletoken; ASTFunctionCallExpression funccall;
+  static final public ASTExpression expressionfunctioncalls(Token token, ASTVariable variable, String nameoffunction) throws ParseException {ASTExpression expression; Token variabletoken; ASTFunctionCallExpression funccall; ASTExpression result = null;
     variabletoken = jj_consume_token(LEFT_PARENTHESIS);
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case TRUE:

@@ -409,7 +409,7 @@ ASTExpression expfive() :
 }
 
 ASTExpression F() :
-{Token t; ASTExpression value = null; ASTVariable variable = null; ASTVariableExpression variableexpression= null; ASTVariable returnvariable = null; ASTFunctionCallExpression functioncallexpression = null;}
+{Token t; ASTExpression value = null; ASTVariable variable = null; ASTVariableExpression variableexpression= null; ASTVariable returnvariable = null; ASTExpression functioncallexpression = null;}
 {
 	<MINUS>value = F() {return new ASTOperatorExpression(new ASTIntegerLiteral(0, 0), value, ASTOperatorExpression.MINUS, 0);}
 |	t = <INTEGER_LITERAL> { return new ASTIntegerLiteral(Integer.parseInt(t.image), t.beginLine);}
@@ -503,7 +503,7 @@ ASTExpression followsvariablenames(Token token) :
 }
 
 ASTExpression expressionfunctioncalls(Token token, ASTVariable variable, String nameoffunction) :
-{ASTExpression expression; Token variabletoken; ASTFunctionCallExpression funccall;}
+{ASTExpression expression; Token variabletoken; ASTFunctionCallExpression funccall; ASTExpression result = null;}
 {
 	variabletoken = <LEFT_PARENTHESIS> ((result = expressionlist(token.image, token))?)	{System.out.println("I HIT HERE");}<RIGHT_PARENTHESIS>
 	{return result;}
