@@ -184,7 +184,6 @@ ASTExpression expressionlist(String nameoffunction, Token variabletoken) :
 {ASTExpression expressioncatch; ASTFunctionCallExpression funccall;}
 {
 /*public ASTFunctionCallStatement(String name, ASTExpression formal, int line) { */
-	{System.out.println("HIT IN EXPRESSIONLIST.");}
     {funccall=new ASTFunctionCallExpression(nameoffunction, variabletoken.beginLine);}
 	expressioncatch = expression() {funccall.addElement(expressioncatch);}((<COMMA>expressioncatch = expression() {funccall.addElement(expressioncatch);})*)
 	{return funccall;}
@@ -272,10 +271,9 @@ ASTVariable bvariable = null; ASTBaseVariable basevariable = null; ASTIfStatemen
 		}
 		/* This handles the case: */
 		if (arrayvariabletoken == null && bvariable != null && expression != null) {
-			System.out.println("HIT HERE HERE");
 			return new ASTAssignmentStatement(bvariable, expression, generaltoken.beginLine);
 		}
-		if (expression == null || bvariable == null) {System.out.println("HIT HERE"); return null;} 
+		if (expression == null || bvariable == null) {return null;} 
 		else {return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);} 
 		
 	}
@@ -463,7 +461,6 @@ ASTVariable followsvariables(ASTVariable astvar) :
 		{nextvariable = new ASTClassVariable(astvar, variabletoken.image, variabletoken.beginLine);}
 		
 		)((returnvariable = followsvariables(nextvariable))?)
-			{System.out.println("Hello");}
 			{if (returnvariable == null) {
 				return nextvariable;
 				}
@@ -474,10 +471,9 @@ ASTVariable followsvariables(ASTVariable astvar) :
 	)
 	(((returnvariable = followsvariables(astvar))
 	{
-		System.out.println("HITTER");
 		return returnvariable;
 	}
-	)?) {System.out.println("YELLO");} {return nextvariable;}
+	)?) {return nextvariable;}
 			/*((followsvariables(nextvariable))?) {return nextvariable;} */
 	//////////////////////////////////////////////////////////////////////////
 
@@ -486,8 +482,7 @@ ASTVariable followsvariables(ASTVariable astvar) :
 			{arrayvar =  new ASTArrayVariable(astvar, express, variabletoken.beginLine);}
 			
 	)((returnvariable = followsvariables(arrayvar))?) 
-		/*{returnvariable = followsvariables(arrayvar);} */
-				{System.out.println("Hello");}  
+		/*{returnvariable = followsvariables(arrayvar);} */ 
 					{if (returnvariable == null) {
 						return arrayvar;
 						} 
@@ -498,10 +493,9 @@ ASTVariable followsvariables(ASTVariable astvar) :
 	) 
 	(((returnvariable = followsvariables(astvar))
 	{
-		System.out.println("HITTER");
 		return returnvariable;
 	}
-	)?) {System.out.println("YELLO");} {return arrayvar;}
+	)?) {return arrayvar;}
 {return nullcase;}
 	
 	
@@ -519,7 +513,7 @@ ASTExpression followsvariablenames(Token token) :
 ASTExpression expressionfunctioncalls(Token token, String nameoffunction) :
 {ASTExpression expression; Token variabletoken; ASTFunctionCallExpression funccall; ASTExpression result = null;}
 {
-	variabletoken = <LEFT_PARENTHESIS> ((result = expressionlist(token.image, token))?)	{System.out.println("I HIT HERE");}<RIGHT_PARENTHESIS>
+	variabletoken = <LEFT_PARENTHESIS> ((result = expressionlist(token.image, token))?)	<RIGHT_PARENTHESIS>
 	{return result;}
 }
 
@@ -536,9 +530,7 @@ ASTFunctionCallExpression funccall = null;}
 |	((<PERIOD> variabletoken = <IDENTIFIER> 
 {classvar = new ASTClassVariable(variable, variabletoken.image, variabletoken.beginLine);}
 )((returnvariable = followsvariablenamesforexpressions(classvar, nameoffunction))?)
-	{System.out.println("JACK");}
 	{if (returnvariable == null) {
-		System.out.println("Retuning classvar.");
 		return classvar;
 		}
 	else {
@@ -548,10 +540,9 @@ ASTFunctionCallExpression funccall = null;}
 )
 (((returnvariable = followsvariablenamesforexpressions(variable, nameoffunction))
 {
-	System.out.println("BBBBBBB");
 	return returnvariable;
 }
-)?) {System.out.println("AAAAAA");} {return classvar;}
+)?) {return classvar;}
 ///////////////////////
 
 
