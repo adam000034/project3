@@ -6,6 +6,7 @@ PARSER_BEGIN(simplejava)
 
 public class simplejava {
 	public static boolean emptyparams = true;	//used for followsvariablenames()
+	public static boolean functioncall = false;
 }
 
 PARSER_END(simplejava)
@@ -219,7 +220,7 @@ ASTStatement statement() :
 /* POSSIBLE PROBLEMS WITH INTIALIZING ARRAYVARIABLETOKEN TO BE NULL */
 {ASTForStatement forstatement; ASTDoWhileStatement dowhile; ASTStatement body; ASTAssignmentStatement assignstate; ASTVariable avariable = null; Token arrayvariabletoken = null; ASTExpression expression = null; int bracketcounter= 0; Token generaltoken; ASTVariable passedinvariable; ASTStatements returner = new ASTStatements();
 ASTVariable bvariable = null; ASTBaseVariable basevariable = null; ASTIfStatement ifstatement;
-ASTFunctionCallStatement funccallstate = null;}
+ASTFunctionCallStatement funccallstate = null; ASTStatement params = null;}
 {
 	dowhile = dowhilestatement() 
 	{return dowhile;}
@@ -239,61 +240,61 @@ ASTFunctionCallStatement funccallstate = null;}
 	passedinvariable))) 
 	/*{if((expression = followsvariablenames())?) */
 	/*THIS MIGHT NOT BE EXACLT RIGHT */
-	((expression = followsvariablenames(generaltoken))?)
+	(((expression = followsvariablenames(token)) | (params = functioncall(token)))?)
 	emptystatement() {	
 		/*This handles the case: int a; */
 		if (bracketcounter == 0 && arrayvariabletoken != null && bvariable == null && expression == null) {	
-			{System.out.println("0");}
+			//{System.out.println("0");}
 			return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, generaltoken.beginLine);
 		}
 		/* This handles the case: a = 4 + 3; */
-		if (bracketcounter == 0 && bvariable == null && expression != null && avariable == null) {
-			{System.out.println("1");}
+		if (!functioncall && bracketcounter == 0 && bvariable == null && expression != null && avariable == null) {
+			//{System.out.println("1");}
 		
 			basevariable = new ASTBaseVariable(generaltoken.image, generaltoken.beginLine);
 			return new ASTAssignmentStatement(basevariable, expression, generaltoken.beginLine);
 		}
 		/* This handles the case: a[3]=4+3; */
 		if (bracketcounter != 0 && bvariable != null && expression != null && avariable == null) {
-					{System.out.println("2");}
+					//{System.out.println("2");}
 		
 			basevariable = new ASTBaseVariable(generaltoken.image, generaltoken.beginLine);
 			return new ASTAssignmentStatement(basevariable, expression, generaltoken.beginLine);
 		}
 		/* This handles the case: int x = 5 + 3;*/
-		if (bracketcounter == 0 && bvariable == null && expression != null) {
-					{System.out.println("3");}
+		if (!functioncall && bracketcounter == 0 && bvariable == null && expression != null) {
+					//{System.out.println("3");}
 		
 			return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, expression,generaltoken.beginLine);
 		}
 		/* This handles the case: int z[]; */
 		if (bracketcounter != 0 && bvariable == null && expression == null) {
-					{System.out.println("4");}
+					//{System.out.println("4");}
 					
 			return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, bracketcounter,generaltoken.beginLine);
 		}
 		/* This handles the case: int z[3][] = 4 + 2; */
-		if (bracketcounter != 0 && bvariable == null && expression != null) {
-					{System.out.println("5");}
+		if (!functioncall && bracketcounter != 0 && bvariable == null && expression != null) {
+					//{System.out.println("5");}
 			
 			return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, bracketcounter, expression, generaltoken.beginLine);
 		}
 		/* This handles the case: */
-		if (arrayvariabletoken == null && bvariable != null && expression != null) {
-					{System.out.println("6");}
+		if (!functioncall && arrayvariabletoken == null && bvariable != null && expression != null) {
+					//{System.out.println("6");}
 			
 			return new ASTAssignmentStatement(bvariable, expression, generaltoken.beginLine);
 		}
-		if (!emptyparams && passedinvariable != null && bvariable == null && avariable == null) {
-					{System.out.println("7");}
-		
+		if (!emptyparams && params!= null && passedinvariable != null && bvariable == null && avariable == null) {
+					//{System.out.println("7");}
+			functioncall = false;
 			emptyparams = true;
-			funccallstate = new ASTFunctionCallStatement(generaltoken.image, expression, generaltoken.beginLine);		
-			return funccallstate;
+			/*funccallstate = new ASTFunctionCallStatement(generaltoken.image, expression, generaltoken.beginLine);*/		
+			return params;
 		}
 		if (emptyparams && passedinvariable != null && bvariable == null && avariable == null) {
-					{System.out.println("8");}
-		
+					//{System.out.println("8");}
+			functioncall = false;
 			funccallstate = new ASTFunctionCallStatement(generaltoken.image, generaltoken.beginLine);			
 			return funccallstate;
 		}
@@ -528,18 +529,32 @@ ASTVariable followsvariables(ASTVariable astvar) :
 }
 
 ASTExpression followsvariablenames(Token token) :
-{ASTExpression value = null; ASTVariable variable; ASTFunctionCallExpression funccallexpression; ASTBaseVariable basevar = new ASTBaseVariable(token.image, token.beginLine);}
+{ASTExpression value = null; ASTBaseVariable basevar = new ASTBaseVariable(token.image, token.beginLine);}
 {
-	<LEFT_PARENTHESIS> ((value = expressionlist(token.image, token))?) <RIGHT_PARENTHESIS> /*((followsvariablenames(token))?)*/ 
-	{
-		if (value != null)
-			emptyparams = false; 
-		return value;
-	}
-|	value = assignmentstatement() 
+	value = assignmentstatement() 
 	{return value;} 
 |	value = incrementstatements(basevar) 
 	{return value;}
+}
+
+ASTStatement functioncall(Token token) :
+{ASTStatement params = null;}
+{
+	<LEFT_PARENTHESIS> ((params = paramslist(token.image, token))?) <RIGHT_PARENTHESIS>
+	{
+		functioncall = true;
+		if (params != null)
+			emptyparams = false; 
+		return params;
+	}
+}
+
+ASTStatement paramslist(String nameoffunction, Token variabletoken) :
+{ASTExpression expressioncatch = null; ASTFunctionCallStatement funccall = new ASTFunctionCallStatement(nameoffunction, variabletoken.beginLine);}
+{
+	/*public ASTFunctionCallStatement(String name, ASTExpression formal, int line) { */
+	expressioncatch = expression() {if (expressioncatch != null) funccall.addElement(expressioncatch);}((<COMMA>expressioncatch = expression() {if (expressioncatch != null) funccall.addElement(expressioncatch);})*)
+	{return funccall;}
 }
 
 ASTExpression expressionfunctioncalls(Token token, String nameoffunction) :

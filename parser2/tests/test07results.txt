@@ -1,3 +1,6 @@
+3
+0
+1
 Parsing Successful
 Prototype: int foo
    No Formals

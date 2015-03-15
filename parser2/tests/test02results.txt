@@ -1,4 +1,9 @@
-hit
+0
+3
+4
+5
+1
+6
 Parsing Successful
 Function Definition: main Return type: void
    No formal parameters

@@ -122,12 +122,10 @@ Function Definition: main Return type: void
                Base Variable w
                2
       }
-      Assign (lhs/rhs)
-         Base Variable foo
-         Function Call: foo
-            +
-               Base Variable x
-               Base Variable y
-            Base Variable z
-            4
+      Function Call: foo
+         +
+            Base Variable x
+            Base Variable y
+         Base Variable z
+         4
    }
