@@ -1,19 +1,8 @@
-0
-0
-0
-1
-0
-0
-5
-6
-6
-1
-3
-1
-1
 Parsing Successful
 Function Definition: divides Return type: boolean
-   No formal parameters
+   Formals:
+      int x
+      int y
    {
       If (test/if body/else body)
          ==
@@ -29,7 +18,8 @@ Function Definition: divides Return type: boolean
             FALSE
    }
 Function Definition: sqrt Return type: int
-   No formal parameters
+   Formals:
+      int x
    {
       int i
       For (initialize/test/increment/body)
@@ -57,7 +47,8 @@ Function Definition: sqrt Return type: int
             No else statement
    }
 Function Definition: prime Return type: boolean
-   No formal parameters
+   Formals:
+      int x
    {
       int i
       For (initialize/test/increment/body)
@@ -83,7 +74,8 @@ Function Definition: prime Return type: boolean
          TRUE
    }
 Function Definition: primes Return type: void
-   No formal parameters
+   Formals:
+      int max
    {
       int i
       For (initialize/test/increment/body)
@@ -101,14 +93,14 @@ Function Definition: primes Return type: void
          If (test/if body/else body)
             Function Call: prime
                Base Variable i
-            Assign (lhs/rhs)
-               Base Variable Print
-               Function Call: Print
-                  Base Variable i
+            Function Call: Print
+               Base Variable i
             No else statement
+      Function Call: Println
    }
 Function Definition: primes2 Return type: void
-   No formal parameters
+   Formals:
+      int max
    {
       int i
       int j
@@ -191,23 +183,18 @@ Function Definition: primes2 Return type: void
             Array Variable (base/index)
                Base Variable primes
                Base Variable i
-            Assign (lhs/rhs)
-               Base Variable Print
-               Function Call: Print
-                  Base Variable i
+            Function Call: Print
+               Base Variable i
             No else statement
+      Function Call: Println
    }
 Function Definition: main Return type: void
    No formal parameters
    {
       int x
-         Base Variable Read
-      Assign (lhs/rhs)
-         Base Variable primes
-         Function Call: primes
-            Base Variable x
-      Assign (lhs/rhs)
-         Base Variable primes2
-         Function Call: primes2
-            Base Variable x
+         Function Call: Read
+      Function Call: primes
+         Base Variable x
+      Function Call: primes2
+         Base Variable x
    }

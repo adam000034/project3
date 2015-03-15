@@ -1,224 +1,72 @@
-4
-0
-3
-3
-0
-3
-3
-3
-1
-6
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-0
-0
-3
-3
-3
-3
-3
-3
-3
-3
-3
-3
-3
-3
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-0
-0
-6
-0
-0
-1
-1
-0
-6
-6
-0
-6
-0
-0
-0
-0
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-3
-1
-1
-1
-1
-3
-1
-1
-1
-1
-1
-1
-1
-1
-3
-1
-1
-1
-1
-3
-1
-1
-1
-1
-1
-1
-1
-1
-3
-1
-1
-1
-1
-3
-1
-1
-1
-1
-0
-0
-0
-0
-1
-1
-1
-1
-1
-1
-1
-1
-1
-0
-0
-0
-0
-6
-6
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-6
-6
-0
-0
-0
-0
-6
-6
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-6
-6
 Parsing Successful
 Class: MinMax
    int move
    int value
 Prototype: void PrintBoard
-   No Formals
+   int board[][]
 Prototype: int swap
-   No Formals
+   int piece
 Prototype: void DoMove
-   No Formals
+   int board[][]
+   int col
+   int piece
 Prototype: void UndoMove
-   No Formals
+   int board[][]
+   int col
 Prototype: boolean win
-   No Formals
+   int board[][]
+   int lastmove
 Prototype: void ClearBoard
-   No Formals
+   int board[][]
 Prototype: boolean legal
-   No Formals
+   int move
+   int board[][]
 Prototype: int GetBoard
-   No Formals
+   int board[][]
+   int col
+   int row
 Prototype: int open1
-   No Formals
+   int board[][]
+   int x
+   int y
+   int color
 Prototype: int half_open2
-   No Formals
+   int board[][]
+   int x
+   int y
+   int color
 Prototype: int open2
-   No Formals
+   int board[][]
+   int x
+   int y
+   int color
 Prototype: int half_open3
-   No Formals
+   int board[][]
+   int x
+   int y
+   int color
 Prototype: int open3
-   No Formals
+   int board[][]
+   int x
+   int y
+   int color
 Prototype: int four
-   No Formals
+   int board[][]
+   int x
+   int y
+   int color
 Prototype: int value
-   No Formals
+   int board[][]
 Prototype: int GetComputerMove
-   No Formals
+   int board[][]
 Prototype: void min
-   No Formals
+   int board[][]
+   int level
+   MinMax result
 Prototype: void max
-   No Formals
+   int board[][]
+   int level
+   MinMax result
 Function Definition: main Return type: void
    No formal parameters
    {
@@ -257,14 +105,10 @@ Function Definition: main Return type: void
                Base Variable i
             New Array of int[]
                10
-      Assign (lhs/rhs)
-         Base Variable ClearBoard
-         Function Call: ClearBoard
-            Base Variable board
-      Assign (lhs/rhs)
-         Base Variable PrintBoard
-         Function Call: PrintBoard
-            Base Variable board
+      Function Call: ClearBoard
+         Base Variable board
+      Function Call: PrintBoard
+         Base Variable board
       While (test/body)
          !
             Base Variable done
@@ -274,6 +118,7 @@ Function Definition: main Return type: void
                   Base Variable player
                   1
                {
+                  Function Call: Println
                   Do-while (test/body)
                      !
                         Function Call: legal
@@ -282,33 +127,27 @@ Function Definition: main Return type: void
                      {
                         Assign (lhs/rhs)
                            Base Variable move
-                           Base Variable Read
+                           Function Call: Read
                      }
                   Empty Statement
                }
                {
-                  Assign (lhs/rhs)
-                     Base Variable min
-                     Function Call: min
-                        Base Variable board
-                        2
-                        Base Variable result
+                  Function Call: min
+                     Base Variable board
+                     2
+                     Base Variable result
                   Assign (lhs/rhs)
                      Base Variable move
                      Class Variable:
                         Base Variable result
                         move
                }
-            Assign (lhs/rhs)
-               Base Variable DoMove
-               Function Call: DoMove
-                  Base Variable board
-                  Base Variable move
-                  Base Variable player
-            Assign (lhs/rhs)
-               Base Variable PrintBoard
-               Function Call: PrintBoard
-                  Base Variable board
+            Function Call: DoMove
+               Base Variable board
+               Base Variable move
+               Base Variable player
+            Function Call: PrintBoard
+               Base Variable board
             Assign (lhs/rhs)
                Base Variable numMoves
                +
@@ -345,13 +184,15 @@ Function Definition: main Return type: void
                Function Call: swap
                   Base Variable player
          }
-      Assign (lhs/rhs)
-         Base Variable Print
-         Function Call: Print
-            Base Variable winner
+      Function Call: Println
+      Function Call: Println
+      Function Call: Print
+         Base Variable winner
+      Function Call: Println
    }
 Function Definition: value Return type: int
-   No formal parameters
+   Formals:
+      int board[][]
    {
       int i
       int j
@@ -559,7 +400,9 @@ Function Definition: value Return type: int
                   3000
    }
 Function Definition: legal Return type: boolean
-   No formal parameters
+   Formals:
+      int move
+      int board[][]
    {
       If (test/if body/else body)
          ||
@@ -587,7 +430,8 @@ Function Definition: legal Return type: boolean
          TRUE
    }
 Function Definition: ClearBoard Return type: void
-   No formal parameters
+   Formals:
+      int board[][]
    {
       int i
       int j
@@ -624,7 +468,8 @@ Function Definition: ClearBoard Return type: void
                0
    }
 Function Definition: PrintBoard Return type: void
-   No formal parameters
+   Formals:
+      int board[][]
    {
       int i
       int j
@@ -653,15 +498,15 @@ Function Definition: PrintBoard Return type: void
                   +
                      Base Variable j
                      1
-               Assign (lhs/rhs)
-                  Base Variable Print
-                  Function Call: Print
+               Function Call: Print
+                  Array Variable (base/index)
                      Array Variable (base/index)
-                        Array Variable (base/index)
-                           Base Variable board
-                           Base Variable i
-                        Base Variable j
+                        Base Variable board
+                        Base Variable i
+                     Base Variable j
+            Function Call: Println
          }
+      Function Call: Println
       For (initialize/test/increment/body)
          Assign (lhs/rhs)
             Base Variable i
@@ -674,13 +519,14 @@ Function Definition: PrintBoard Return type: void
             +
                Base Variable i
                1
-         Assign (lhs/rhs)
-            Base Variable Print
-            Function Call: Print
-               Base Variable i
+         Function Call: Print
+            Base Variable i
+      Function Call: Println
+      Function Call: Println
    }
 Function Definition: swap Return type: int
-   No formal parameters
+   Formals:
+      int piece
    {
       If (test/if body/else body)
          ==
@@ -692,7 +538,10 @@ Function Definition: swap Return type: int
             1
    }
 Function Definition: DoMove Return type: void
-   No formal parameters
+   Formals:
+      int board[][]
+      int col
+      int piece
    {
       int i
       For (initialize/test/increment/body)
@@ -739,7 +588,9 @@ Function Definition: DoMove Return type: void
          Base Variable piece
    }
 Function Definition: UndoMove Return type: void
-   No formal parameters
+   Formals:
+      int board[][]
+      int col
    {
       int i
       For (initialize/test/increment/body)
@@ -777,7 +628,9 @@ Function Definition: UndoMove Return type: void
          }
    }
 Function Definition: win Return type: boolean
-   No formal parameters
+   Formals:
+      int board[][]
+      int movecol
    {
       int moverow
       int length
@@ -1040,7 +893,10 @@ Function Definition: win Return type: boolean
          FALSE
    }
 Function Definition: GetBoard Return type: int
-   No formal parameters
+   Formals:
+      int board[][]
+      int col
+      int row
    {
       If (test/if body/else body)
          ||
@@ -1069,7 +925,11 @@ Function Definition: GetBoard Return type: int
             Base Variable row
    }
 Function Definition: open1 Return type: int
-   No formal parameters
+   Formals:
+      int board[][]
+      int x
+      int y
+      int color
    {
       int total
          0
@@ -1220,7 +1080,11 @@ Function Definition: open1 Return type: int
          Base Variable total
    }
 Function Definition: half_open2 Return type: int
-   No formal parameters
+   Formals:
+      int board[][]
+      int x
+      int y
+      int color
    {
       int total
          0
@@ -1671,7 +1535,11 @@ Function Definition: half_open2 Return type: int
          Base Variable total
    }
 Function Definition: open2 Return type: int
-   No formal parameters
+   Formals:
+      int board[][]
+      int x
+      int y
+      int color
    {
       int total
          0
@@ -1862,7 +1730,11 @@ Function Definition: open2 Return type: int
          Base Variable total
    }
 Function Definition: half_open3 Return type: int
-   No formal parameters
+   Formals:
+      int board[][]
+      int x
+      int y
+      int color
    {
       int total
          0
@@ -2393,7 +2265,11 @@ Function Definition: half_open3 Return type: int
          Base Variable total
    }
 Function Definition: open3 Return type: int
-   No formal parameters
+   Formals:
+      int board[][]
+      int x
+      int y
+      int color
    {
       int total
          0
@@ -2624,7 +2500,11 @@ Function Definition: open3 Return type: int
          Base Variable total
    }
 Function Definition: four Return type: int
-   No formal parameters
+   Formals:
+      int board[][]
+      int x
+      int y
+      int color
    {
       int total
          0
@@ -2815,7 +2695,8 @@ Function Definition: four Return type: int
          Base Variable total
    }
 Function Definition: GetComputerMove Return type: int
-   No formal parameters
+   Formals:
+      int board[][]
    {
       int best_value
       int best_move
@@ -2835,12 +2716,10 @@ Function Definition: GetComputerMove Return type: int
                Base Variable i
                1
          Empty Statement
-      Assign (lhs/rhs)
-         Base Variable DoMove
-         Function Call: DoMove
-            Base Variable board
-            Base Variable i
-            2
+      Function Call: DoMove
+         Base Variable board
+         Base Variable i
+         2
       Assign (lhs/rhs)
          Base Variable best_move
          Base Variable i
@@ -2848,11 +2727,9 @@ Function Definition: GetComputerMove Return type: int
          Base Variable best_value
          Function Call: value
             Base Variable board
-      Assign (lhs/rhs)
-         Base Variable UndoMove
-         Function Call: UndoMove
-            Base Variable board
-            Base Variable i
+      Function Call: UndoMove
+         Base Variable board
+         Base Variable i
       For (initialize/test/increment/body)
          Assign (lhs/rhs)
             Base Variable i
@@ -2868,12 +2745,10 @@ Function Definition: GetComputerMove Return type: int
                Base Variable i
                1
          {
-            Assign (lhs/rhs)
-               Base Variable DoMove
-               Function Call: DoMove
-                  Base Variable board
-                  Base Variable i
-                  2
+            Function Call: DoMove
+               Base Variable board
+               Base Variable i
+               2
             Assign (lhs/rhs)
                Base Variable value
                Function Call: value
@@ -2891,17 +2766,18 @@ Function Definition: GetComputerMove Return type: int
                      Base Variable i
                }
                No else statement
-            Assign (lhs/rhs)
-               Base Variable UndoMove
-               Function Call: UndoMove
-                  Base Variable board
-                  Base Variable i
+            Function Call: UndoMove
+               Base Variable board
+               Base Variable i
          }
       Return
          Base Variable best_move
    }
 Function Definition: min Return type: void
-   No formal parameters
+   Formals:
+      int board[][]
+      int level
+      MinMax result
    {
       int best_value
       int best_move
@@ -2942,33 +2818,27 @@ Function Definition: min Return type: void
                Base Variable i
                1
          Empty Statement
-      Assign (lhs/rhs)
-         Base Variable DoMove
-         Function Call: DoMove
-            Base Variable board
-            Base Variable i
-            2
+      Function Call: DoMove
+         Base Variable board
+         Base Variable i
+         2
       Assign (lhs/rhs)
          Base Variable best_move
          Base Variable i
-      Assign (lhs/rhs)
-         Base Variable max
-         Function Call: max
-            Base Variable board
-            -
-               Base Variable level
-               1
-            Base Variable result
+      Function Call: max
+         Base Variable board
+         -
+            Base Variable level
+            1
+         Base Variable result
       Assign (lhs/rhs)
          Base Variable best_value
          Class Variable:
             Base Variable result
             value
-      Assign (lhs/rhs)
-         Base Variable UndoMove
-         Function Call: UndoMove
-            Base Variable board
-            Base Variable i
+      Function Call: UndoMove
+         Base Variable board
+         Base Variable i
       For (initialize/test/increment/body)
          Assign (lhs/rhs)
             Base Variable i
@@ -2984,20 +2854,16 @@ Function Definition: min Return type: void
                Base Variable i
                1
          {
-            Assign (lhs/rhs)
-               Base Variable DoMove
-               Function Call: DoMove
-                  Base Variable board
-                  Base Variable i
-                  2
-            Assign (lhs/rhs)
-               Base Variable max
-               Function Call: max
-                  Base Variable board
-                  -
-                     Base Variable level
-                     1
-                  Base Variable result
+            Function Call: DoMove
+               Base Variable board
+               Base Variable i
+               2
+            Function Call: max
+               Base Variable board
+               -
+                  Base Variable level
+                  1
+               Base Variable result
             Assign (lhs/rhs)
                Base Variable value
                Class Variable:
@@ -3016,11 +2882,9 @@ Function Definition: min Return type: void
                      Base Variable i
                }
                No else statement
-            Assign (lhs/rhs)
-               Base Variable UndoMove
-               Function Call: UndoMove
-                  Base Variable board
-                  Base Variable i
+            Function Call: UndoMove
+               Base Variable board
+               Base Variable i
          }
       Assign (lhs/rhs)
          Class Variable:
@@ -3034,7 +2898,10 @@ Function Definition: min Return type: void
          Base Variable best_value
    }
 Function Definition: max Return type: void
-   No formal parameters
+   Formals:
+      int board[][]
+      int level
+      MinMax result
    {
       int best_value
       int best_move
@@ -3075,33 +2942,27 @@ Function Definition: max Return type: void
                Base Variable i
                1
          Empty Statement
-      Assign (lhs/rhs)
-         Base Variable DoMove
-         Function Call: DoMove
-            Base Variable board
-            Base Variable i
-            1
+      Function Call: DoMove
+         Base Variable board
+         Base Variable i
+         1
       Assign (lhs/rhs)
          Base Variable best_move
          Base Variable i
-      Assign (lhs/rhs)
-         Base Variable min
-         Function Call: min
-            Base Variable board
-            -
-               Base Variable level
-               1
-            Base Variable result
+      Function Call: min
+         Base Variable board
+         -
+            Base Variable level
+            1
+         Base Variable result
       Assign (lhs/rhs)
          Base Variable best_value
          Class Variable:
             Base Variable result
             value
-      Assign (lhs/rhs)
-         Base Variable UndoMove
-         Function Call: UndoMove
-            Base Variable board
-            Base Variable i
+      Function Call: UndoMove
+         Base Variable board
+         Base Variable i
       For (initialize/test/increment/body)
          Assign (lhs/rhs)
             Base Variable i
@@ -3117,20 +2978,16 @@ Function Definition: max Return type: void
                Base Variable i
                1
          {
-            Assign (lhs/rhs)
-               Base Variable DoMove
-               Function Call: DoMove
-                  Base Variable board
-                  Base Variable i
+            Function Call: DoMove
+               Base Variable board
+               Base Variable i
+               1
+            Function Call: min
+               Base Variable board
+               -
+                  Base Variable level
                   1
-            Assign (lhs/rhs)
-               Base Variable min
-               Function Call: min
-                  Base Variable board
-                  -
-                     Base Variable level
-                     1
-                  Base Variable result
+               Base Variable result
             Assign (lhs/rhs)
                Base Variable value
                Class Variable:
@@ -3149,11 +3006,9 @@ Function Definition: max Return type: void
                      Base Variable i
                }
                No else statement
-            Assign (lhs/rhs)
-               Base Variable UndoMove
-               Function Call: UndoMove
-                  Base Variable board
-                  Base Variable i
+            Function Call: UndoMove
+               Base Variable board
+               Base Variable i
          }
       Assign (lhs/rhs)
          Class Variable:

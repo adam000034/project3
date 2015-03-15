@@ -1,4 +1,3 @@
-3
 Parsing Successful
 Class: foo
    int x

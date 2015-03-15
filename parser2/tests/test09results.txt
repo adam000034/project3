@@ -1,105 +1,27 @@
-5
-0
-1
-1
-5
-1
-1
-5
-3
-6
-1
-3
-0
-1
-3
-0
-0
-1
-6
-6
-6
-1
-3
-0
-0
-0
-0
-0
-1
-1
-6
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-1
-6
-6
-1
-1
-1
-1
-1
-1
-6
-1
-1
-1
-1
-1
-1
-6
-1
-1
-1
-1
-6
-1
-1
-1
-1
-6
-3
-3
-1
-1
-6
-0
-3
-1
-1
-3
-6
-1
 Parsing Successful
 Class: LabelRec
    int Label
    int ProgramIndex
 Prototype: void ExecuteProgram
-   No Formals
+   int Memory[]
+   LabelRec Labels[]
 Prototype: void setlabels
-   No Formals
+   int Memory[]
+   LabelRec Labels[]
 Prototype: int countLabels
-   No Formals
+   int Memory[]
 Prototype: int ExecuteCommand
-   No Formals
+   int Memory[]
+   int IP
+   int Registers[]
+   LabelRec Labels[]
 Prototype: int getLabelIndex
-   No Formals
+   LabelRec Labels[]
+   int label
 Prototype: void LoadProgram
-   No Formals
+   int Memory[]
 Prototype: void PrintProgram
-   No Formals
+   int Memory[]
 Function Definition: main Return type: void
    No formal parameters
    {
@@ -107,31 +29,26 @@ Function Definition: main Return type: void
          New Array of int[]
             1000
       int Labels
-      Assign (lhs/rhs)
-         Base Variable LoadProgram
-         Function Call: LoadProgram
-            Base Variable Memory
-      Assign (lhs/rhs)
-         Base Variable PrintProgram
-         Function Call: PrintProgram
-            Base Variable Memory
+      Function Call: LoadProgram
+         Base Variable Memory
+      Function Call: Println
+      Function Call: PrintProgram
+         Base Variable Memory
       LabelRec Labels[]
          New Array of LabelRec[]
             Function Call: countLabels
                Base Variable Memory
-      Assign (lhs/rhs)
-         Base Variable setlabels
-         Function Call: setlabels
-            Base Variable Memory
-            Base Variable Labels
-      Assign (lhs/rhs)
-         Base Variable ExecuteProgram
-         Function Call: ExecuteProgram
-            Base Variable Memory
-            Base Variable Labels
+      Function Call: setlabels
+         Base Variable Memory
+         Base Variable Labels
+      Function Call: ExecuteProgram
+         Base Variable Memory
+         Base Variable Labels
    }
 Function Definition: ExecuteProgram Return type: void
-   No formal parameters
+   Formals:
+      int Memory[]
+      LabelRec Labels[]
    {
       int Registers[]
          New Array of int[]
@@ -164,7 +81,8 @@ Function Definition: ExecuteProgram Return type: void
          }
    }
 Function Definition: countLabels Return type: int
-   No formal parameters
+   Formals:
+      int Memory[]
    {
       int numLabels
          0
@@ -203,7 +121,9 @@ Function Definition: countLabels Return type: int
          Base Variable numLabels
    }
 Function Definition: setlabels Return type: void
-   No formal parameters
+   Formals:
+      int Program[]
+      LabelRec Labels[]
    {
       int currlabel
          0
@@ -271,7 +191,11 @@ Function Definition: setlabels Return type: void
          }
    }
 Function Definition: ExecuteCommand Return type: int
-   No formal parameters
+   Formals:
+      int Memory[]
+      int IP
+      int Registers[]
+      LabelRec Labels[]
    {
       int command
          Array Variable (base/index)
@@ -333,17 +257,14 @@ Function Definition: ExecuteCommand Return type: int
                               Array Variable (base/index)
                                  Base Variable Registers
                                  Base Variable r1
-                              Base Variable Read
+                              Function Call: Read
                         }
                         {
-                           Assign (lhs/rhs)
-                              Base Variable Print
-                              Function Call: Print
-                                 99
-                           Assign (lhs/rhs)
-                              Base Variable Print
-                              Function Call: Print
-                                 Base Variable r1
+                           Function Call: Print
+                              99
+                           Function Call: Print
+                              Base Variable r1
+                           Function Call: Println
                         }
                   }
                   {
@@ -361,12 +282,11 @@ Function Definition: ExecuteCommand Return type: int
                               Base Variable r1
                               9
                         {
-                           Assign (lhs/rhs)
-                              Base Variable Print
-                              Function Call: Print
-                                 Array Variable (base/index)
-                                    Base Variable Registers
-                                    Base Variable r1
+                           Function Call: Print
+                              Array Variable (base/index)
+                                 Base Variable Registers
+                                 Base Variable r1
+                           Function Call: Println
                         }
                         No else statement
                   }
@@ -831,7 +751,9 @@ Function Definition: ExecuteCommand Return type: int
                                  No else statement
    }
 Function Definition: getLabelIndex Return type: int
-   No formal parameters
+   Formals:
+      LabelRec Labels[]
+      int label
    {
       int i
       For (initialize/test/increment/body)
@@ -863,7 +785,8 @@ Function Definition: getLabelIndex Return type: int
          }
    }
 Function Definition: PrintProgram Return type: void
-   No formal parameters
+   Formals:
+      int Memory[]
    {
       int index
          0
@@ -876,12 +799,11 @@ Function Definition: PrintProgram Return type: void
                   1
             0
          {
-            Assign (lhs/rhs)
-               Base Variable Print
-               Function Call: Print
-                  Array Variable (base/index)
-                     Base Variable Memory
-                     Base Variable index
+            Function Call: Print
+               Array Variable (base/index)
+                  Base Variable Memory
+                  Base Variable index
+            Function Call: Println
             Assign (lhs/rhs)
                Base Variable index
                +
@@ -889,9 +811,11 @@ Function Definition: PrintProgram Return type: void
                   1
          }
       Empty Statement
+      Function Call: Println
    }
 Function Definition: LoadProgram Return type: void
-   No formal parameters
+   Formals:
+      int Memory[]
    {
       int index
          0
@@ -908,7 +832,7 @@ Function Definition: LoadProgram Return type: void
                Array Variable (base/index)
                   Base Variable Memory
                   Base Variable index
-               Base Variable Read
+               Function Call: Read
             Assign (lhs/rhs)
                Base Variable index
                +

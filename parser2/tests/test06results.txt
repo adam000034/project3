@@ -1,8 +1,12 @@
 Parsing Successful
 Prototype: int foo
-   No Formals
+   int x
+   int y
+   boolean z
+   int w[]
 Prototype: void print2
-   No Formals
+   int x
+   int y
 Function Definition: main Return type: void
    No formal parameters
    {
@@ -32,7 +36,11 @@ Function Definition: main Return type: void
          3
    }
 Function Definition: foo Return type: int
-   No formal parameters
+   Formals:
+      int x
+      int y
+      boolean z
+      int w[]
    {
       If (test/if body/else body)
          Base Variable z
@@ -50,7 +58,9 @@ Function Definition: foo Return type: int
                   1
    }
 Function Definition: print2 Return type: void
-   No formal parameters
+   Formals:
+      int x
+      int y
    {
       Function Call: print
          Base Variable x
