@@ -96,7 +96,7 @@ Function Definition: main Return type: void
                      Base Variable y
                      z
                   2
-               Base Variable foo
+               Function Call: foo
             Function Call: bar
                +
                   Base Variable x

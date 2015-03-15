@@ -1058,7 +1058,10 @@ if (expressioncatch != null) funccall.addElement(expressioncatch);
       ;
     }
     jj_consume_token(RIGHT_PARENTHESIS);
-{if ("" != null) return result;}
+if (result == null)
+                        {if ("" != null) return new ASTFunctionCallExpression(token.image, token.beginLine);}
+                else
+                        {if ("" != null) return result;}
     throw new Error("Missing return statement in function");
   }
 

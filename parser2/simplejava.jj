@@ -561,7 +561,12 @@ ASTExpression expressionfunctioncalls(Token token, String nameoffunction) :
 {ASTExpression expression; Token variabletoken; ASTFunctionCallExpression funccall; ASTExpression result = null;}
 {
 	variabletoken = <LEFT_PARENTHESIS> ((result = expressionlist(token.image, token))?)	<RIGHT_PARENTHESIS>
-	{return result;}
+	{
+		if (result == null)
+			return new ASTFunctionCallExpression(token.image, token.beginLine);
+		else
+			return result;
+	}
 }
 
 ASTVariable followsvariablenamesforexpressions(ASTVariable variable, String nameoffunction) :
