@@ -1,0 +1,95 @@
+Parsing Successful
+Class: MinMax
+   int move
+   int value
+Prototype: void PrintBoard
+   No Formals
+Prototype: int swap
+   No Formals
+Prototype: void DoMove
+   No Formals
+Prototype: void UndoMove
+   No Formals
+Prototype: boolean win
+   No Formals
+Prototype: void ClearBoard
+   No Formals
+Prototype: boolean legal
+   No Formals
+Prototype: int GetBoard
+   No Formals
+Prototype: int open1
+   No Formals
+Prototype: int half_open2
+   No Formals
+Prototype: int open2
+   No Formals
+Prototype: int half_open3
+   No Formals
+Prototype: int open3
+   No Formals
+Prototype: int four
+   No Formals
+Prototype: int value
+   No Formals
+Prototype: int GetComputerMove
+   No Formals
+Prototype: void min
+   No Formals
+Prototype: void max
+   No Formals
+Function Definition: main Return type: void
+   No formal parameters
+   {
+      int board[][]
+      int i
+      boolean done
+         FALSE
+      int player
+         1
+      int move
+      int numMoves
+         0
+      int winner
+         0
+      MinMax result
+         New MinMax
+      Assign (lhs/rhs)
+         Base Variable board
+         New Array of int[][]
+            10
+      For (initialize/test/increment/body)
+         Assign (lhs/rhs)
+            Base Variable i
+            0
+         <
+            Base Variable i
+            10
+         Assign (lhs/rhs)
+            Base Variable i
+            +
+               Base Variable i
+               1
+         Assign (lhs/rhs)
+            Array Variable (base/index)
+               Base Variable board
+               Base Variable i
+            New Array of int[]
+               10
+      Assign (lhs/rhs)
+         Base Variable ClearBoard
+         Function Call: ClearBoard
+            Base Variable board
+      Assign (lhs/rhs)
+         Base Variable PrintBoard
+         Function Call: PrintBoard
+            Base Variable board
+      While (test/body)
+         !
+            Base Variable done
+         {
+            If (test/if body/else body)
+               ==
+                  Base Variable player
+                  1
+               {

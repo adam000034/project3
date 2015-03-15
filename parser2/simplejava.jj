@@ -177,10 +177,9 @@ ASTInstanceVariableDefs variabledefinitions() :
 }
 
 ASTExpression expressionlist(String nameoffunction, Token variabletoken) :
-{ASTExpression expressioncatch; ASTFunctionCallExpression funccall;}
+{ASTExpression expressioncatch; ASTFunctionCallExpression funccall = new ASTFunctionCallExpression(nameoffunction, variabletoken.beginLine);}
 {
-/*public ASTFunctionCallStatement(String name, ASTExpression formal, int line) { */
-    {funccall=new ASTFunctionCallExpression(nameoffunction, variabletoken.beginLine);}
+	/*public ASTFunctionCallStatement(String name, ASTExpression formal, int line) { */
 	expressioncatch = expression() {funccall.addElement(expressioncatch);}((<COMMA>expressioncatch = expression() {funccall.addElement(expressioncatch);})*)
 	{return funccall;}
 }
@@ -241,7 +240,7 @@ ASTVariable bvariable = null; ASTBaseVariable basevariable = null; ASTIfStatemen
 	((expression = followsvariablenames(generaltoken))?)
 	emptystatement() {
 		/*This handles the case: int a; */
-		if (bracketcounter == 0 && bvariable == null && expression == null) {
+		if (bracketcounter == 0 && arrayvariabletoken != null && bvariable == null && expression == null) {
 			return new ASTVariableDefStatement(generaltoken.image, arrayvariabletoken.image, generaltoken.beginLine);
 		}
 		/* This handles the case: a = 4 + 3; */
@@ -502,10 +501,12 @@ ASTVariable followsvariables(ASTVariable astvar) :
 ASTExpression followsvariablenames(Token token) :
 {ASTExpression value = null; ASTVariable variable; ASTFunctionCallExpression funccallexpression; ASTBaseVariable basevar = new ASTBaseVariable(token.image, token.beginLine);}
 {
-	<LEFT_PARENTHESIS> ((value = expressionlist(token.image, token))?) <RIGHT_PARENTHESIS> ((followsvariablenames(token))?) 
-	{if (value != null) return value;}
-|	value = assignmentstatement() {return value;} 
-|	value = incrementstatements(basevar) {return value;}
+	<LEFT_PARENTHESIS> ((value = expressionlist(token.image, token))?) <RIGHT_PARENTHESIS> /*((followsvariablenames(token))?)*/ 
+	{return value;}
+|	value = assignmentstatement() 
+	{return value;} 
+|	value = incrementstatements(basevar) 
+	{return value;}
 }
 
 ASTExpression expressionfunctioncalls(Token token, String nameoffunction) :
@@ -519,7 +520,13 @@ ASTVariable followsvariablenamesforexpressions(ASTVariable variable, String name
 {ASTExpression result = null; ASTArrayVariable arrayvar = null; ASTClassVariable classvar = null; Token variabletoken; ASTBaseVariable basevar = null; ASTVariable returnvariable = null;
 ASTFunctionCallExpression funccall = null;}
 {
-	variabletoken = <IDENTIFIER> {basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);} ((followsvariablenamesforexpressions(basevar, nameoffunction))*) 
+	variabletoken = <IDENTIFIER> {basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);} 
+	((returnvariable = followsvariablenamesforexpressions(basevar, nameoffunction))?)
+	{	if (returnvariable == null)
+			return basevar;
+		else 
+			return returnvariable; 
+	} 
 
 //--------------------------------------------------------------------------------------------------
 |	((<PERIOD> variabletoken = <IDENTIFIER> 
