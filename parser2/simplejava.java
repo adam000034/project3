@@ -121,9 +121,9 @@ if (semicolonchecker != null) {
 //|	<LEFT_BRACE> ((statement())*) <RIGHT_BRACE>
 //}
   static final public 
-ASTFormals formalparameterlist() throws ParseException {ASTFormals formals = null; ASTFormal formal = null;
+ASTFormals formalparameterlist() throws ParseException {ASTFormals formals = new ASTFormals(); ASTFormal formal = null;
     formal = formalparameter();
-if (formal != null) {formals = new ASTFormals(formal);}
+if (formal != null) {formals.addElement(formal);}
     label_4:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -139,9 +139,7 @@ if (formal != null) {formals = new ASTFormals(formal);}
       formal = formalparameter();
     }
 if (formal != null) {formals.addElement(formal);}
-if (formals != null) {
-                {if ("" != null) return formals;}
-        }
+{if ("" != null) return formals;}
     throw new Error("Missing return statement in function");
   }
 
@@ -149,12 +147,9 @@ if (formals != null) {
     type = jj_consume_token(IDENTIFIER);
     name = jj_consume_token(IDENTIFIER);
     variabledeclarations();
-if (checker == true) {
-                returnformal = new ASTFormal(type.image, name.image, type.beginLine);
-        }
-if (returnformal != null) {
-                {if ("" != null) return returnformal;}
-        }
+if (checker)
+                        returnformal = new ASTFormal(type.image, name.image, type.beginLine);
+{if ("" != null) return returnformal;}
     throw new Error("Missing return statement in function");
   }
 
@@ -929,7 +924,7 @@ if (returnvariable == null) {
     throw new Error("Missing return statement in function");
   }
 
-  static final public ASTExpression followsvariablenames(Token token) throws ParseException {ASTExpression value; ASTVariable variable; ASTFunctionCallExpression funccallexpression; ASTBaseVariable basevar = new ASTBaseVariable(token.image, token.beginLine);
+  static final public ASTExpression followsvariablenames(Token token) throws ParseException {ASTExpression value = null; ASTVariable variable; ASTFunctionCallExpression funccallexpression; ASTBaseVariable basevar = new ASTBaseVariable(token.image, token.beginLine);
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case LEFT_PARENTHESIS:{
       jj_consume_token(LEFT_PARENTHESIS);
@@ -942,7 +937,7 @@ if (returnvariable == null) {
       case LEFT_PARENTHESIS:
       case INTEGER_LITERAL:
       case IDENTIFIER:{
-        expressionlist(token.image, token);
+        value = expressionlist(token.image, token);
         break;
         }
       default:
@@ -962,6 +957,7 @@ if (returnvariable == null) {
         jj_la1[40] = jj_gen;
         ;
       }
+{if ("" != null) return value;}
       break;
       }
     case GETS:{

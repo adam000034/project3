@@ -134,24 +134,20 @@ ASTFunctionDefinition functionprototypeordefinition() :
 //}
 
 ASTFormals formalparameterlist() :
-{ASTFormals formals = null; ASTFormal formal = null;}
+{ASTFormals formals = new ASTFormals(); ASTFormal formal = null;}
 {
-	(formal = formalparameter()) {if (formal != null) {formals = new ASTFormals(formal);}}((<COMMA> formal = formalparameter())*) {if (formal != null) {formals.addElement(formal);}}
-	{if (formals != null) {
-		return formals;
-	}}
+	(formal = formalparameter()) {if (formal != null) {formals.addElement(formal);}}((<COMMA> formal = formalparameter())*) {if (formal != null) {formals.addElement(formal);}}
+	{return formals;}
 }
 
 ASTFormal formalparameter() :
 {ASTFormal returnformal = null; Token type; Token name; boolean checker = false;}
 {
 	type = <IDENTIFIER> name = <IDENTIFIER> variabledeclarations()
-	{if (checker == true) {
-		returnformal = new ASTFormal(type.image, name.image, type.beginLine);
-	}}
-	{if (returnformal != null) {
-		return returnformal;
-	}}
+	{	if (checker)
+			returnformal = new ASTFormal(type.image, name.image, type.beginLine);
+	}
+	{return returnformal;}
 }
 
 int variabledeclarations() :
@@ -504,10 +500,10 @@ ASTVariable followsvariables(ASTVariable astvar) :
 }
 
 ASTExpression followsvariablenames(Token token) :
-{ASTExpression value; ASTVariable variable; ASTFunctionCallExpression funccallexpression; ASTBaseVariable basevar = new ASTBaseVariable(token.image, token.beginLine);}
+{ASTExpression value = null; ASTVariable variable; ASTFunctionCallExpression funccallexpression; ASTBaseVariable basevar = new ASTBaseVariable(token.image, token.beginLine);}
 {
-	
-	<LEFT_PARENTHESIS> ((expressionlist(token.image, token))?) <RIGHT_PARENTHESIS> ((followsvariablenames(token))?)
+	<LEFT_PARENTHESIS> ((value = expressionlist(token.image, token))?) <RIGHT_PARENTHESIS> ((followsvariablenames(token))?) 
+	{if (value != null) return value;}
 |	value = assignmentstatement() {return value;} 
 |	value = incrementstatements(basevar) {return value;}
 }
@@ -523,32 +519,26 @@ ASTVariable followsvariablenamesforexpressions(ASTVariable variable, String name
 {ASTExpression result = null; ASTArrayVariable arrayvar = null; ASTClassVariable classvar = null; Token variabletoken; ASTBaseVariable basevar = null; ASTVariable returnvariable = null;
 ASTFunctionCallExpression funccall = null;}
 {
-/* Double question mark might be overkill, question mark here and it's caller has ? as well */
+	variabletoken = <IDENTIFIER> {basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);} ((followsvariablenamesforexpressions(basevar, nameoffunction))*) 
 
-
-	variabletoken = <IDENTIFIER> {basevar = new ASTBaseVariable(variabletoken.image, variabletoken.beginLine);}((followsvariablenamesforexpressions(basevar, nameoffunction))*) 
-
-/////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 |	((<PERIOD> variabletoken = <IDENTIFIER> 
-{classvar = new ASTClassVariable(variable, variabletoken.image, variabletoken.beginLine);}
-)((returnvariable = followsvariablenamesforexpressions(classvar, nameoffunction))?)
-	{if (returnvariable == null) {
-		return classvar;
+	{classvar = new ASTClassVariable(variable, variabletoken.image, variabletoken.beginLine);})
+	((returnvariable = followsvariablenamesforexpressions(classvar, nameoffunction))?)
+		{if (returnvariable == null) {
+			return classvar;
+			}
+		else {
+			return returnvariable; 
+			}
 		}
-	else {
-		return returnvariable; 
-		}
+	)
+	(((returnvariable = followsvariablenamesforexpressions(variable, nameoffunction))
+	{
+		return returnvariable;
 	}
-)
-(((returnvariable = followsvariablenamesforexpressions(variable, nameoffunction))
-{
-	return returnvariable;
-}
-)?) {return classvar;}
-///////////////////////
-
-
-//////////////////////////////////////
+	)?) {return classvar;}
+//--------------------------------------------------------------------------------------------------
 |	((<LEFT_BRACKET> result = expression() variabletoken = <RIGHT_BRACKET>
 	{arrayvar = new ASTArrayVariable(variable, result, variabletoken.beginLine);}
 	)((returnvariable = followsvariablenamesforexpressions(arrayvar, nameoffunction))?)
@@ -565,8 +555,8 @@ ASTFunctionCallExpression funccall = null;}
 		return returnvariable;
 	}
 	)?) {return arrayvar;}
-////////////////////////////////////////
-/*Handled by caller */
+//--------------------------------------------------------------------------------------------------
+	/*Handled by caller */
 /*|	incrementstatements(variable) */
 }
 

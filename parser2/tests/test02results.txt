@@ -4,16 +4,13 @@ Function Definition: main Return type: void
    {
       int x
       int y
-         I got hit.
          3
       int z[][][][][]
       int x[][]
          New Array of int[][]
-            I got hit.
             3
       Assign (lhs/rhs)
          Base Variable x
-         I got hit.
          3
       Assign (lhs/rhs)
          Array Variable (base/index)
@@ -28,18 +25,14 @@ Function Definition: main Return type: void
                                     Array Variable (base/index)
                                        Array Variable (base/index)
                                           Base Variable x
-                                          I got hit.
                                           3
-                                       I got hit.
                                        4
                                     foo
-                                 I got hit.
                                  8
                               bar
                            Class Variable:
                               Base Variable x
                               y
-                        I got hit.
                         3
                      z
                   w
