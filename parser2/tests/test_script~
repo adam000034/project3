@@ -1,3 +1,5 @@
+ ~/tools/javacc-6.0/bin/javacc simplejava.jj
+javac *.java
 java TestParser tests/test01.sjava > tests/test01results.txt
 java TestParser tests/test02.sjava > tests/test02results.txt
 java TestParser tests/test03.sjava > tests/test03results.txt
