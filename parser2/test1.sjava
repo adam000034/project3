@@ -1,7 +1,6 @@
 void main() {
-  
-   if ((x < 2) || (y > 3))
-      z = 3 > 4 && 5 < 2 || booleanFunction(x);
+while ((x > 2))
+      z = (((((foo(x))))));
 }   
 
  x = 3 + 4;

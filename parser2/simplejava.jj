@@ -93,22 +93,30 @@ ASTOperatorExpression decrementstatement(ASTVariable variable) :
 	{return new ASTOperatorExpression(new ASTVariableExpression(variable, variable.line()), new ASTIntegerLiteral(1, variable.line()), "-", variable.line());}
 }
 
-void program() :
-{}
-{    
-/*perhaps put a star there to check multiple statements */
-	/* 1) 0 or more class defs	2) 0 or more function defs	3) EOF */
-	((classdefinitions())*) ((functionprototypeordefinition())*) <EOF> 
-//	expression() 
+ASTProgram program() :
+{
+	ASTClasses classes = new ASTClasses();
+	ASTClass classdef = null;
+	ASTFunctionDefinitions functiondefinitions = new ASTFunctionDefinitions();
+	ASTFunctionDefinition funcdef = null;
 }
-
-
+{    
+	/* 1) 0 or more class defs	2) 0 or more function defs	3) EOF */
+	((classdef = classdefinitions() {classes.addElement(classdef);})*) 
+	((funcdef = functionprototypeordefinition() {functiondefinitions.addElement(funcdef);})*) 
+	<EOF>
+	{	if (classdef != null)
+			return new ASTProgram(classes, functiondefinitions, classdef.line());
+		else
+			return new ASTProgram(classes, functiondefinitions, 0);
+	} 
+}
 
 ASTFunctionDefinition functionprototypeordefinition() :
 {Token type; Token name; ASTFormals formals = new ASTFormals(); ASTStatements body = new ASTStatements(); int line; ASTEmptyStatement semicolonchecker = null; ASTStatement returnedstatement = null;}
 {
 	
-	type = <IDENTIFIER> name = <IDENTIFIER> <LEFT_PARENTHESIS> ((formals = formalparameterlist())?) <RIGHT_PARENTHESIS> (semicolonchecker = emptystatement() | <LEFT_BRACE> ((returnedstatement = statement() {body.addElement(returnedstatement);})*) )
+	type = <IDENTIFIER> name = <IDENTIFIER> <LEFT_PARENTHESIS> ((formals = formalparameterlist())?) <RIGHT_PARENTHESIS> (semicolonchecker = emptystatement() | <LEFT_BRACE> ((returnedstatement = statement() {body.addElement(returnedstatement);})*) <RIGHT_BRACE>)
 	{if (semicolonchecker != null) {
 		return new ASTPrototype(type.image, name.image, formals, type.beginLine);
 	}else {
@@ -116,14 +124,14 @@ ASTFunctionDefinition functionprototypeordefinition() :
 	}}
 }
 
-void functionendingafterparen() :
-{}
-{
+//void functionendingafterparen() :
+//{}
+//{
 	/* FUNCTION PROTOTYPE */
-	<SEMICOLON>
+//	<SEMICOLON>
 	/* FUNCTION DEFINITION */
-|	<LEFT_BRACE> ((statement())*) <RIGHT_BRACE>
-}
+//|	<LEFT_BRACE> ((statement())*) <RIGHT_BRACE>
+//}
 
 ASTFormals formalparameterlist() :
 {ASTFormals formals = null; ASTFormal formal = null;}
@@ -182,11 +190,11 @@ ASTExpression expressionlist(String nameoffunction, Token variabletoken) :
 	{return funccall;}
 }
 
-void statementlist() :
-{}
-{
-	statement()((statement())*)
-}
+//void statementlist() :
+//{}
+//{
+//	statement()((statement())*)
+//}
 
 ASTVariable variable(ASTVariable passedinvar) :
 {ASTVariable var = null;}
@@ -196,13 +204,12 @@ ASTVariable variable(ASTVariable passedinvar) :
 	
 }
 
-void followsclassdefinitionstypes() :
-{}
-{
+//void followsclassdefinitionstypes() :
+//{}
+//{
 /* HAVE  TO CONSIDER THI CASE EVENTUALLY */
-	<LEFT_BRACKET> ((followsbracketsone())+) 
-
-}
+//	<LEFT_BRACKET> ((followsbracketsone())+) 
+//}
 
 ASTClass classdefinitions() :
 {ASTClass astclass = null; Token stringt; ASTInstanceVariableDefs variabledefs = null;}
@@ -570,11 +577,11 @@ ASTFunctionCallExpression funccall = null;}
 /*|	incrementstatements(variable) */
 }
 
-void followsbracketsone() :
-{}
-{
-	expression() <RIGHT_BRACKET> (((<LEFT_BRACKET><RIGHT_BRACKET>)))
-}
+//void followsbracketsone() :
+//{}
+//{
+//	expression() <RIGHT_BRACKET> (((<LEFT_BRACKET><RIGHT_BRACKET>)))
+//}
 
 ASTExpression followsbrackets(Token t) :
 {int counter = 0; ASTExpression value = null;}
