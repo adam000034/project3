@@ -1,0 +1,53 @@
+Parsing Successful
+Function Definition: main Return type: void
+   No formal parameters
+   {
+      int x
+      int y
+         I got hit.
+         3
+      int z[][][][][]
+      int x[][]
+         New Array of int[][]
+            I got hit.
+            3
+      Assign (lhs/rhs)
+         Base Variable x
+         I got hit.
+         3
+      Assign (lhs/rhs)
+         Array Variable (base/index)
+            Class Variable:
+               Class Variable:
+                  Class Variable:
+                     Array Variable (base/index)
+                        Array Variable (base/index)
+                           Class Variable:
+                              Array Variable (base/index)
+                                 Class Variable:
+                                    Array Variable (base/index)
+                                       Array Variable (base/index)
+                                          Base Variable x
+                                          I got hit.
+                                          3
+                                       I got hit.
+                                       4
+                                    foo
+                                 I got hit.
+                                 8
+                              bar
+                           Class Variable:
+                              Base Variable x
+                              y
+                        I got hit.
+                        3
+                     z
+                  w
+               x
+            Class Variable:
+               Class Variable:
+                  Base Variable x
+                  y
+               z
+         Base Variable y
+   }

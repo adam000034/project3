@@ -207,7 +207,6 @@ if (counter == 0) {
   }
 
   static final public ASTExpression expressionlist(String nameoffunction, Token variabletoken) throws ParseException {ASTExpression expressioncatch; ASTFunctionCallExpression funccall;
-System.out.println("HIT IN EXPRESSIONLIST.");
 funccall=new ASTFunctionCallExpression(nameoffunction, variabletoken.beginLine);
     expressioncatch = expression();
 funccall.addElement(expressioncatch);
@@ -315,7 +314,8 @@ ASTVariable bvariable = null; ASTBaseVariable basevariable = null; ASTIfStatemen
       break;
       }
     case FOR:{
-      forstatement();
+      forstatement = forstatement();
+{if ("" != null) return forstatement;}
       break;
       }
     case LEFT_BRACE:{
@@ -338,9 +338,11 @@ ASTVariable bvariable = null; ASTBaseVariable basevariable = null; ASTIfStatemen
           jj_la1[11] = jj_gen;
           break label_8;
         }
-        statement();
+        body = statement();
+returner.addElement(body);
       }
       jj_consume_token(RIGHT_BRACE);
+{if ("" != null) return returner;}
       break;
       }
     case IDENTIFIER:{
@@ -399,15 +401,15 @@ avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beg
                 }
                 /* This handles the case: */
                 if (arrayvariabletoken == null && bvariable != null && expression != null) {
-                        System.out.println("HIT HERE HERE");
                         {if ("" != null) return new ASTAssignmentStatement(bvariable, expression, generaltoken.beginLine);}
                 }
-                if (expression == null || bvariable == null) {System.out.println("HIT HERE"); {if ("" != null) return null;}}
+                if (expression == null || bvariable == null) {{if ("" != null) return null;}}
                 else {{if ("" != null) return new ASTAssignmentStatement(avariable, expression, arrayvariabletoken.beginLine);}}
       break;
       }
     case SEMICOLON:{
-      emptystatement();
+      body = emptystatement();
+{if ("" != null) return body;}
       break;
       }
     default:
@@ -831,6 +833,7 @@ if (variableexpression != null) {
     case ADD:{
       /*ASTAssignmentStatement(variable, ASTExpression value, int line) { */
               expression = incrementstatement(basevar);
+{if ("" != null) return expression;}
       break;
       }
     case MINUSMINUS:{
@@ -862,7 +865,6 @@ nextvariable = new ASTClassVariable(astvar, variabletoken.image, variabletoken.b
         jj_la1[34] = jj_gen;
         ;
       }
-System.out.println("Hello");
 if (returnvariable == null) {
                                 {if ("" != null) return nextvariable;}
                                 }
@@ -873,15 +875,13 @@ if (returnvariable == null) {
       case LEFT_BRACKET:
       case PERIOD:{
         returnvariable = followsvariables(astvar);
-System.out.println("HITTER");
-                {if ("" != null) return returnvariable;}
+{if ("" != null) return returnvariable;}
         break;
         }
       default:
         jj_la1[35] = jj_gen;
         ;
       }
-System.out.println("YELLO");
 {if ("" != null) return nextvariable;}
       break;
       }
@@ -900,7 +900,6 @@ arrayvar =  new ASTArrayVariable(astvar, express, variabletoken.beginLine);
         jj_la1[36] = jj_gen;
         ;
       }
-System.out.println("Hello");
 if (returnvariable == null) {
                                                 {if ("" != null) return arrayvar;}
                                                 }
@@ -911,15 +910,13 @@ if (returnvariable == null) {
       case LEFT_BRACKET:
       case PERIOD:{
         returnvariable = followsvariables(astvar);
-System.out.println("HITTER");
-                {if ("" != null) return returnvariable;}
+{if ("" != null) return returnvariable;}
         break;
         }
       default:
         jj_la1[37] = jj_gen;
         ;
       }
-System.out.println("YELLO");
 {if ("" != null) return arrayvar;}
 {if ("" != null) return nullcase;}
       break;
@@ -1004,7 +1001,6 @@ System.out.println("YELLO");
       jj_la1[42] = jj_gen;
       ;
     }
-System.out.println("I HIT HERE");
     jj_consume_token(RIGHT_PARENTHESIS);
 {if ("" != null) return result;}
     throw new Error("Missing return statement in function");
@@ -1051,9 +1047,7 @@ classvar = new ASTClassVariable(variable, variabletoken.image, variabletoken.beg
         jj_la1[44] = jj_gen;
         ;
       }
-System.out.println("JACK");
 if (returnvariable == null) {
-                System.out.println("Retuning classvar.");
                 {if ("" != null) return classvar;}
                 }
         else {
@@ -1064,15 +1058,13 @@ if (returnvariable == null) {
       case PERIOD:
       case IDENTIFIER:{
         returnvariable = followsvariablenamesforexpressions(variable, nameoffunction);
-System.out.println("BBBBBBB");
-        {if ("" != null) return returnvariable;}
+{if ("" != null) return returnvariable;}
         break;
         }
       default:
         jj_la1[45] = jj_gen;
         ;
       }
-System.out.println("AAAAAA");
 {if ("" != null) return classvar;}
       break;
       }
