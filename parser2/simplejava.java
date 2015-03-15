@@ -30,7 +30,7 @@ public class simplejava implements simplejavaConstants {
         break label_1;
       }
       classdef = classdefinitions();
-classes.addElement(classdef);
+if (classes != null) classes.addElement(classdef);
     }
     label_2:
     while (true) {
@@ -44,7 +44,7 @@ classes.addElement(classdef);
         break label_2;
       }
       funcdef = functionprototypeordefinition();
-functiondefinitions.addElement(funcdef);
+if (funcdef != null) functiondefinitions.addElement(funcdef);
     }
     jj_consume_token(0);
 if (classdef != null)
@@ -94,7 +94,7 @@ if (classdef != null)
           break label_3;
         }
         returnedstatement = statement();
-body.addElement(returnedstatement);
+if (returnedstatement != null)body.addElement(returnedstatement);
       }
       jj_consume_token(RIGHT_BRACE);
       break;
@@ -201,10 +201,10 @@ if (counter == 0) {
     throw new Error("Missing return statement in function");
   }
 
-  static final public ASTExpression expressionlist(String nameoffunction, Token variabletoken) throws ParseException {ASTExpression expressioncatch; ASTFunctionCallExpression funccall = new ASTFunctionCallExpression(nameoffunction, variabletoken.beginLine);
+  static final public ASTExpression expressionlist(String nameoffunction, Token variabletoken) throws ParseException {ASTExpression expressioncatch = null; ASTFunctionCallExpression funccall = new ASTFunctionCallExpression(nameoffunction, variabletoken.beginLine);
     /*public ASTFunctionCallStatement(String name, ASTExpression formal, int line) { */
             expressioncatch = expression();
-funccall.addElement(expressioncatch);
+if (expressioncatch != null) funccall.addElement(expressioncatch);
     label_7:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -218,7 +218,7 @@ funccall.addElement(expressioncatch);
       }
       jj_consume_token(COMMA);
       expressioncatch = expression();
-funccall.addElement(expressioncatch);
+if (expressioncatch != null) funccall.addElement(expressioncatch);
     }
 {if ("" != null) return funccall;}
     throw new Error("Missing return statement in function");
@@ -334,7 +334,7 @@ ASTVariable bvariable = null; ASTBaseVariable basevariable = null; ASTIfStatemen
           break label_8;
         }
         body = statement();
-returner.addElement(body);
+if (body != null) returner.addElement(body);
       }
       jj_consume_token(RIGHT_BRACE);
 {if ("" != null) return returner;}

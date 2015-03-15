@@ -1,0 +1,12 @@
+java TestParser tests/test01.sjava > tests/test01results.txt
+java TestParser tests/test02.sjava > tests/test02results.txt
+java TestParser tests/test03.sjava > tests/test03results.txt
+java TestParser tests/test04.sjava > tests/test04results.txt
+java TestParser tests/test05.sjava > tests/test05results.txt
+java TestParser tests/test06.sjava > tests/test06results.txt
+java TestParser tests/test07.sjava > tests/test07results.txt
+java TestParser tests/test08.sjava > tests/test08results.txt
+java TestParser tests/test09.sjava > tests/test09results.txt
+java TestParser tests/test10.sjava > tests/test10results.txt
+java TestParser tests/test11.sjava > tests/test11results.txt
+

@@ -102,8 +102,8 @@ ASTProgram program() :
 }
 {    
 	/* 1) 0 or more class defs	2) 0 or more function defs	3) EOF */
-	((classdef = classdefinitions() {classes.addElement(classdef);})*) 
-	((funcdef = functionprototypeordefinition() {functiondefinitions.addElement(funcdef);})*) 
+	((classdef = classdefinitions() {if (classes != null) classes.addElement(classdef);})*) 
+	((funcdef = functionprototypeordefinition() {if (funcdef != null) functiondefinitions.addElement(funcdef);})*) 
 	<EOF>
 	{	if (classdef != null)
 			return new ASTProgram(classes, functiondefinitions, classdef.line());
@@ -116,7 +116,7 @@ ASTFunctionDefinition functionprototypeordefinition() :
 {Token type; Token name; ASTFormals formals = new ASTFormals(); ASTStatements body = new ASTStatements(); int line; ASTEmptyStatement semicolonchecker = null; ASTStatement returnedstatement = null;}
 {
 	
-	type = <IDENTIFIER> name = <IDENTIFIER> <LEFT_PARENTHESIS> ((formals = formalparameterlist())?) <RIGHT_PARENTHESIS> (semicolonchecker = emptystatement() | <LEFT_BRACE> ((returnedstatement = statement() {body.addElement(returnedstatement);})*) <RIGHT_BRACE>)
+	type = <IDENTIFIER> name = <IDENTIFIER> <LEFT_PARENTHESIS> ((formals = formalparameterlist())?) <RIGHT_PARENTHESIS> (semicolonchecker = emptystatement() | <LEFT_BRACE> ((returnedstatement = statement() {if (returnedstatement != null)body.addElement(returnedstatement);})*) <RIGHT_BRACE>)
 	{if (semicolonchecker != null) {
 		return new ASTPrototype(type.image, name.image, formals, type.beginLine);
 	}else {
@@ -177,10 +177,10 @@ ASTInstanceVariableDefs variabledefinitions() :
 }
 
 ASTExpression expressionlist(String nameoffunction, Token variabletoken) :
-{ASTExpression expressioncatch; ASTFunctionCallExpression funccall = new ASTFunctionCallExpression(nameoffunction, variabletoken.beginLine);}
+{ASTExpression expressioncatch = null; ASTFunctionCallExpression funccall = new ASTFunctionCallExpression(nameoffunction, variabletoken.beginLine);}
 {
 	/*public ASTFunctionCallStatement(String name, ASTExpression formal, int line) { */
-	expressioncatch = expression() {funccall.addElement(expressioncatch);}((<COMMA>expressioncatch = expression() {funccall.addElement(expressioncatch);})*)
+	expressioncatch = expression() {if (expressioncatch != null) funccall.addElement(expressioncatch);}((<COMMA>expressioncatch = expression() {if (expressioncatch != null) funccall.addElement(expressioncatch);})*)
 	{return funccall;}
 }
 
@@ -229,7 +229,7 @@ ASTVariable bvariable = null; ASTBaseVariable basevariable = null; ASTIfStatemen
 	{return ifstatement;}
 |	forstatement = forstatement()
 	{return forstatement;}
-|	<LEFT_BRACE> ((body = statement() {returner.addElement(body);})*) <RIGHT_BRACE>
+|	<LEFT_BRACE> ((body = statement() {if (body != null) returner.addElement(body);})*) <RIGHT_BRACE>
 	{return returner;}
 	/* Note: bvariable correlates to followsvariables */
 |	generaltoken = <IDENTIFIER> {passedinvariable = new ASTBaseVariable(generaltoken.image, generaltoken.beginLine);} ((arrayvariabletoken= <IDENTIFIER>  bracketcounter = variabledeclarations() {avariable = new ASTBaseVariable(arrayvariabletoken.image, arrayvariabletoken.beginLine);})| (bvariable = variable(
