@@ -797,6 +797,7 @@ result = new ASTOperatorExpression(result, rhs, t.image, t.beginLine);
         jj_la1[32] = jj_gen;
         ;
       }
+if (functioncallexpression != null ) {{if ("" != null) return functioncallexpression;}}
 variable = new ASTBaseVariable(t.image, t.beginLine);
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case ADD:
@@ -808,6 +809,7 @@ variable = new ASTBaseVariable(t.image, t.beginLine);
         jj_la1[33] = jj_gen;
         ;
       }
+if (incrementexpression != null) {{if ("" != null) return incrementexpression;}}
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case LEFT_BRACKET:
       case PERIOD:
@@ -820,13 +822,7 @@ variable = new ASTBaseVariable(t.image, t.beginLine);
         ;
       }
 variableexpression = new ASTVariableExpression(variable, variable.line());
-if (variableexpression == null && functioncallexpression == null) {
-        {if ("" != null) return incrementexpression;}
-}
-else if (variableexpression == null && incrementexpression == null) {
-        {if ("" != null) return functioncallexpression;}
-}
-else {
+if (variableexpression != null) {
         {if ("" != null) return variableexpression;}
 }
       break;

@@ -416,14 +416,8 @@ ASTExpression F() :
 |	t = <INTEGER_LITERAL> { return new ASTIntegerLiteral(Integer.parseInt(t.image), t.beginLine);}
 |	t = <TRUE> { return new ASTBooleanLiteral(Boolean.parseBoolean(t.image), t.beginLine);}
 |	t = <FALSE> {return new ASTBooleanLiteral(Boolean.parseBoolean(t.image), t.beginLine);}
-|	t = <IDENTIFIER> ((functioncallexpression = expressionfunctioncalls(t, t.image))?) {variable = new ASTBaseVariable(t.image, t.beginLine);} ((incrementexpression = incrementstatements(variable))?)  ((variable = followsvariablenamesforexpressions(variable, t.image))?) {variableexpression = new ASTVariableExpression(variable, variable.line());}	{
-if (variableexpression == null && functioncallexpression == null) {
-	return incrementexpression;
-}
-else if (variableexpression == null && incrementexpression == null) {
-	return functioncallexpression;
-}
-else {
+|	t = <IDENTIFIER> ((functioncallexpression = expressionfunctioncalls(t, t.image))?) {if (functioncallexpression != null ) {return functioncallexpression;}} {variable = new ASTBaseVariable(t.image, t.beginLine);} ((incrementexpression = incrementstatements(variable))?) {if (incrementexpression != null) {return incrementexpression;}}  ((variable = followsvariablenamesforexpressions(variable, t.image))?) {variableexpression = new ASTVariableExpression(variable, variable.line());}	{
+if (variableexpression != null) {
 	return variableexpression;
 }}
 |	<NEW> t = <IDENTIFIER> value = followsnewandidentifier(t) {return value;}
